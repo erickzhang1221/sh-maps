@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年全国医学院在河南招生录取分数线地图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .header {
+            text-align: center;
+            padding: 24px 20px 10px;
+            background: linear-gradient(180deg, rgba(16, 24, 60, 0.95) 0%, rgba(10, 14, 39, 0.8) 100%);
+            border-bottom: 1px solid rgba(100, 140, 255, 0.2);
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            color: #8892b0;
+            letter-spacing: 2px;
+        }
+        .header .note {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .main-container {
+            display: flex;
+            height: calc(100vh - 120px);
+            position: relative;
+        }
+        #map-container {
+            flex: 1;
+            position: relative;
+            min-width: 0;
+        }
+        #map-chart {
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar {
+            width: 340px;
+            background: rgba(16, 24, 60, 0.95);
+            border-left: 1px solid rgba(100, 140, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(100, 140, 255, 0.15);
+            background: rgba(20, 30, 70, 0.6);
+        }
+        .sidebar-header h3 {
+            font-size: 16px;
+            color: #e2e8f0;
+            margin-bottom: 4px;
+        }
+        .sidebar-header .count {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .legend-container {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(100, 140, 255, 0.15);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .legend-item:hover { opacity: 0.85; }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .legend-label {
+            flex: 1;
+            color: #cbd5e1;
+        }
+        .legend-score {
+            color: #64748b;
+            font-size: 12px;
+        }
+        .school-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .school-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .school-list::-webkit-scrollbar-thumb {
+            background: rgba(100, 140, 255, 0.3);
+            border-radius: 2px;
+        }
+        .school-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .school-item:hover {
+            background: rgba(100, 140, 255, 0.1);
+            border-left-color: #60a5fa;
+        }
+        .school-item.selected {
+            background: rgba(100, 140, 255, 0.15);
+            border-left-color: #60a5fa;
+        }
+        .school-rank {
+            font-size: 12px;
+            font-weight: 700;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .school-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .school-name {
+            font-size: 13px;
+            color: #e2e8f0;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .school-location {
+            font-size: 11px;
+            color: #64748b;
+        }
+        .school-score {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            flex-shrink: 0;
+        }
+        .search-box {
+            margin: 12px 20px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            border-radius: 8px;
+            border: 1px solid rgba(100, 140, 255, 0.25);
+            background: rgba(10, 14, 39, 0.8);
+            color: #e2e8f0;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #60a5fa;
+        }
+        .search-box input::placeholder {
+            color: #475569;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 14px;
+        }
+        .footer {
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #475569;
+            border-top: 1px solid rgba(100, 140, 255, 0.1);
+        }
+        .tooltip-custom {
+            background: rgba(16, 24, 60, 0.96) !important;
+            border: 1px solid rgba(100, 140, 255, 0.4) !important;
+            border-radius: 10px !important;
+            padding: 12px 16px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+            pointer-events: auto !important;
+        }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; max-height: 40vh; border-left: none; border-top: 1px solid rgba(100,140,255,0.2); }
+            #map-container { height: 55vh; }
+            .header h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>2025年全国医学院在河南招生录取分数线地图</h1>
+        <div class="subtitle">数据来源：河南省教育考试院及各院校招生官网 | 物理类本科批最低投档分</div>
+        <div class="note">注：部分分数为院校专业组最低分，仅供参考。标注"~"为近似值。</div>
+    </div>
+    <div class="main-container">
+        <div id="map-container">
+            <div id="map-chart"></div>
+        </div>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>全国医学院校列表</h3>
+                <div class="count" id="school-count">共加载 0 所院校</div>
+            </div>
+            <div class="legend-container" id="legend-container"></div>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="搜索院校名称或省份...">
+            </div>
+            <div class="school-list" id="school-list"></div>
+            <div class="footer">点击地图标记或列表项查看详情 | 滚轮缩放地图</div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 2025年全国医学院在河南招生数据
+    // 数据来源：河南省教育考试院、各校招生官网、gaokao.cn等
+    // 分数为2025年河南物理类本科批最低投档分
+    // ============================================================
+
+    const tiers = [
+        { id: 's', name: 'S级 - 顶尖医学院', color: '#ef4444', range: '≥660分', bg: 'rgba(239,68,68,0.18)' },
+        { id: 'a', name: 'A级 - 双一流/985医学院', color: '#f97316', range: '620-659分', bg: 'rgba(249,115,22,0.18)' },
+        { id: 'b', name: 'B级 - 区域重点医科大学', color: '#eab308', range: '570-619分', bg: 'rgba(234,179,8,0.18)' },
+        { id: 'c', name: 'C级 - 省属医科大学', color: '#22c55e', range: '520-569分', bg: 'rgba(34,197,94,0.18)' },
+        { id: 'd', name: 'D级 - 地方医学院', color: '#3b82f6', range: '<520分', bg: 'rgba(59,130,246,0.18)' },
+    ];
+
+    const tierOrder = { 's': 0, 'a': 1, 'b': 2, 'c': 3, 'd': 4 };
+
+    // 医学院数据：名称、省份、城市、坐标、2025河南最低分、等级、备注
+    const schools = [
+        // ---- S级：顶尖医学院 (≥660) ----
+        { name: '北京大学医学部', province: '北京', city: '北京', coord: [116.40, 39.90], score: 693, tier: 's', note: '985/双一流' },
+        { name: '复旦大学上海医学院', province: '上海', city: '上海', coord: [121.47, 31.23], score: 688, tier: 's', note: '985/双一流' },
+        { name: '上海交通大学医学院', province: '上海', city: '上海', coord: [121.50, 31.20], score: 686, tier: 's', note: '985/双一流' },
+        { name: '浙江大学医学院', province: '浙江', city: '杭州', coord: [120.15, 30.28], score: 680, tier: 's', note: '985/双一流' },
+        { name: '北京协和医学院', province: '北京', city: '北京', coord: [116.38, 39.92], score: 675, tier: 's', note: '双一流' },
+        { name: '四川大学华西医学中心', province: '四川', city: '成都', coord: [104.07, 30.67], score: 668, tier: 's', note: '985/双一流' },
+        { name: '华中科技大学同济医学院', province: '湖北', city: '武汉', coord: [114.30, 30.60], score: 662, tier: 's', note: '985/双一流' },
+        { name: '中山大学中山医学院', province: '广东', city: '广州', coord: [113.26, 23.13], score: 660, tier: 's', note: '985/双一流' },
+
+        // ---- A级：双一流/985医学院 (620-659) ----
+        { name: '中南大学湘雅医学院', province: '湖南', city: '长沙', coord: [112.94, 28.23], score: 655, tier: 'a', note: '985/双一流' },
+        { name: '武汉大学医学部', province: '湖北', city: '武汉', coord: [114.32, 30.57], score: 652, tier: 'a', note: '985/双一流' },
+        { name: '同济大学医学院', province: '上海', city: '上海', coord: [121.48, 31.25], score: 650, tier: 'a', note: '985/双一流' },
+        { name: '首都医科大学', province: '北京', city: '北京', coord: [116.35, 39.88], score: 636, tier: 'a', note: '双一流' },
+        { name: '南京医科大学', province: '江苏', city: '南京', coord: [118.79, 32.06], score: 634, tier: 'a', note: '双一流' },
+        { name: '中国医科大学', province: '辽宁', city: '沈阳', coord: [123.43, 41.80], score: 634, tier: 'a', note: '省部共建' },
+        { name: '南方医科大学', province: '广东', city: '广州', coord: [113.30, 23.18], score: 630, tier: 'a', note: '省部共建' },
+        { name: '天津医科大学', province: '天津', city: '天津', coord: [117.20, 39.13], score: 628, tier: 'a', note: '211/双一流' },
+        { name: '苏州大学医学部', province: '江苏', city: '苏州', coord: [120.58, 31.30], score: 625, tier: 'a', note: '211/双一流' },
+        { name: '吉林大学白求恩医学院', province: '吉林', city: '长春', coord: [125.32, 43.90], score: 622, tier: 'a', note: '985/双一流' },
+
+        // ---- B级：区域重点医科大学 (570-619) ----
+        { name: '山东大学齐鲁医学院', province: '山东', city: '济南', coord: [117.00, 36.67], score: 620, tier: 'b', note: '985/双一流' },
+        { name: '西安交通大学医学部', province: '陕西', city: '西安', coord: [108.94, 34.26], score: 618, tier: 'b', note: '985/双一流' },
+        { name: '郑州大学医学院', province: '河南', city: '郑州', coord: [113.62, 34.75], score: 615, tier: 'b', note: '211/双一流' },
+        { name: '重庆医科大学', province: '重庆', city: '重庆', coord: [106.55, 29.57], score: 612, tier: 'b', note: '省部共建' },
+        { name: '哈尔滨医科大学', province: '黑龙江', city: '哈尔滨', coord: [126.53, 45.80], score: 610, tier: 'b', note: '省部共建' },
+        { name: '温州医科大学', province: '浙江', city: '温州', coord: [120.70, 28.00], score: 605, tier: 'b', note: '省部共建' },
+        { name: '河北医科大学', province: '河北', city: '石家庄', coord: [114.51, 38.04], score: 595, tier: 'b', note: '省属重点' },
+        { name: '安徽医科大学', province: '安徽', city: '合肥', coord: [117.23, 31.86], score: 592, tier: 'b', note: '省属重点' },
+        { name: '大连医科大学', province: '辽宁', city: '大连', coord: [121.62, 38.92], score: 590, tier: 'b', note: '省属重点' },
+        { name: '广州医科大学', province: '广东', city: '广州', coord: [113.28, 23.15], score: 588, tier: 'b', note: '双一流' },
+        { name: '东南大学医学院', province: '江苏', city: '南京', coord: [118.80, 32.04], score: 615, tier: 'b', note: '985/双一流' },
+        { name: '广西医科大学', province: '广西', city: '南宁', coord: [108.33, 22.82], score: 585, tier: 'b', note: '省属重点' },
+        { name: '福建医科大学', province: '福建', city: '福州', coord: [119.30, 26.07], score: 582, tier: 'b', note: '省属重点' },
+        { name: '山西医科大学', province: '山西', city: '太原', coord: [112.55, 37.87], score: 580, tier: 'b', note: '省属重点' },
+        { name: '青岛大学医学院', province: '山东', city: '青岛', coord: [120.38, 36.07], score: 578, tier: 'b', note: '省属重点' },
+        { name: '徐州医科大学', province: '江苏', city: '徐州', coord: [117.18, 34.27], score: 575, tier: 'b', note: '省属重点' },
+
+        // ---- C级：省属医科大学 (520-569) ----
+        { name: '昆明医科大学', province: '云南', city: '昆明', coord: [102.83, 24.88], score: 572, tier: 'c', note: '省属重点' },
+        { name: '广东医科大学', province: '广东', city: '湛江', coord: [110.36, 21.27], score: 570, tier: 'c', note: '省属重点' },
+        { name: '宁夏医科大学', province: '宁夏', city: '银川', coord: [106.23, 38.49], score: 568, tier: 'c', note: '省属重点' },
+        { name: '贵州医科大学', province: '贵州', city: '贵阳', coord: [106.71, 26.57], score: 562, tier: 'c', note: '省属重点' },
+        { name: '西南医科大学', province: '四川', city: '泸州', coord: [105.44, 28.87], score: 560, tier: 'c', note: '省属重点' },
+        { name: '河南医药大学', province: '河南', city: '新乡', coord: [113.88, 35.30], score: 558, tier: 'c', note: '原新乡医学院' },
+        { name: '遵义医科大学', province: '贵州', city: '遵义', coord: [106.93, 27.73], score: 555, tier: 'c', note: '省属重点' },
+        { name: '锦州医科大学', province: '辽宁', city: '锦州', coord: [121.12, 41.10], score: 550, tier: 'c', note: '省属' },
+        { name: '内蒙古医科大学', province: '内蒙古', city: '呼和浩特', coord: [111.75, 40.84], score: 548, tier: 'c', note: '省属重点' },
+        { name: '新疆医科大学', province: '新疆', city: '乌鲁木齐', coord: [87.62, 43.82], score: 545, tier: 'c', note: '省属重点' },
+        { name: '山东第二医科大学', province: '山东', city: '潍坊', coord: [119.16, 36.71], score: 542, tier: 'c', note: '原潍坊医学院' },
+        { name: '蚌埠医科大学', province: '安徽', city: '蚌埠', coord: [117.38, 32.92], score: 540, tier: 'c', note: '原蚌埠医学院' },
+        { name: '皖南医学院', province: '安徽', city: '芜湖', coord: [118.43, 31.35], score: 538, tier: 'c', note: '省属' },
+        { name: '川北医学院', province: '四川', city: '南充', coord: [106.11, 30.84], score: 535, tier: 'c', note: '省属' },
+        { name: '滨州医学院', province: '山东', city: '滨州', coord: [118.02, 37.38], score: 533, tier: 'c', note: '省属' },
+        { name: '桂林医科大学', province: '广西', city: '桂林', coord: [110.29, 25.27], score: 530, tier: 'c', note: '原桂林医学院' },
+
+        // ---- D级：地方医学院 (<520) ----
+        { name: '沈阳医学院', province: '辽宁', city: '沈阳', coord: [123.41, 41.82], score: 528, tier: 'd', note: '省属' },
+        { name: '赣南医科大学', province: '江西', city: '赣州', coord: [114.93, 25.83], score: 525, tier: 'd', note: '原赣南医学院' },
+        { name: '湖北医药学院', province: '湖北', city: '十堰', coord: [110.80, 32.65], score: 522, tier: 'd', note: '省属' },
+        { name: '西安医学院', province: '陕西', city: '西安', coord: [108.97, 34.28], score: 520, tier: 'd', note: '省属' },
+        { name: '右江民族医学院', province: '广西', city: '百色', coord: [106.62, 23.90], score: 516, tier: 'd', note: '省属' },
+        { name: '承德医学院', province: '河北', city: '承德', coord: [117.93, 40.97], score: 513, tier: 'd', note: '省属' },
+        { name: '济宁医学院', province: '山东', city: '济宁', coord: [116.58, 35.41], score: 510, tier: 'd', note: '省属' },
+        { name: '齐齐哈尔医学院', province: '黑龙江', city: '齐齐哈尔', coord: [123.92, 47.35], score: 505, tier: 'd', note: '省属' },
+        { name: '牡丹江医科大学', province: '黑龙江', city: '牡丹江', coord: [129.63, 44.55], score: 500, tier: 'd', note: '原牡丹江医学院' },
+        { name: '长治医学院', province: '山西', city: '长治', coord: [113.12, 36.20], score: 496, tier: 'd', note: '省属' },
+        { name: '吉林医药学院', province: '吉林', city: '吉林', coord: [126.55, 43.84], score: 493, tier: 'd', note: '省属' },
+        { name: '豫北医学院', province: '河南', city: '新乡', coord: [113.90, 35.28], score: 480, tier: 'd', note: '民办(原新乡医学院三全学院)' },
+        { name: '南昌医学院', province: '江西', city: '南昌', coord: [115.86, 28.68], score: 478, tier: 'd', note: '省属' },
+        { name: '厦门医学院', province: '福建', city: '厦门', coord: [118.08, 24.48], score: 475, tier: 'd', note: '省属' },
+        { name: '杭州医学院', province: '浙江', city: '杭州', coord: [120.14, 30.30], score: 472, tier: 'd', note: '省属' },
+        { name: '上海健康医学院', province: '上海', city: '上海', coord: [121.52, 31.18], score: 470, tier: 'd', note: '市属' },
+        { name: '甘肃医学院', province: '甘肃', city: '平凉', coord: [106.67, 35.54], score: 465, tier: 'd', note: '省属' },
+        { name: '新疆第二医学院', province: '新疆', city: '克拉玛依', coord: [84.88, 45.58], score: 440, tier: 'd', note: '省属' },
+
+        // ---- 中医药院校 ----
+        { name: '北京中医药大学', province: '北京', city: '北京', coord: [116.36, 39.89], score: 610, tier: 'b', note: '211/双一流·中医药' },
+        { name: '上海中医药大学', province: '上海', city: '上海', coord: [121.49, 31.22], score: 600, tier: 'b', note: '双一流·中医药' },
+        { name: '南京中医药大学', province: '江苏', city: '南京', coord: [118.81, 32.05], score: 595, tier: 'b', note: '双一流·中医药' },
+        { name: '天津中医药大学', province: '天津', city: '天津', coord: [117.18, 39.11], score: 590, tier: 'b', note: '双一流·中医药' },
+        { name: '广州中医药大学', province: '广东', city: '广州', coord: [113.27, 23.14], score: 588, tier: 'b', note: '双一流·中医药' },
+        { name: '成都中医药大学', province: '四川', city: '成都', coord: [104.05, 30.69], score: 562, tier: 'c', note: '双一流·中医药' },
+        { name: '浙江中医药大学', province: '浙江', city: '杭州', coord: [120.13, 30.29], score: 575, tier: 'b', note: '省属重点·中医药' },
+        { name: '山东中医药大学', province: '山东', city: '济南', coord: [117.02, 36.65], score: 555, tier: 'c', note: '省属重点·中医药' },
+        { name: '河南中医药大学', province: '河南', city: '郑州', coord: [113.60, 34.73], score: 520, tier: 'c', note: '省属重点·中医药' },
+        { name: '湖南中医药大学', province: '湖南', city: '长沙', coord: [112.92, 28.25], score: 545, tier: 'c', note: '省属重点·中医药' },
+        { name: '湖北中医药大学', province: '湖北', city: '武汉', coord: [114.28, 30.58], score: 535, tier: 'c', note: '省属·中医药' },
+        { name: '辽宁中医药大学', province: '辽宁', city: '沈阳', coord: [123.45, 41.78], score: 530, tier: 'c', note: '省属·中医药' },
+        { name: '长春中医药大学', province: '吉林', city: '长春', coord: [125.30, 43.88], score: 525, tier: 'c', note: '省属·中医药' },
+        { name: '黑龙江中医药大学', province: '黑龙江', city: '哈尔滨', coord: [126.55, 45.78], score: 518, tier: 'd', note: '省属·中医药' },
+        { name: '福建中医药大学', province: '福建', city: '福州', coord: [119.28, 26.09], score: 528, tier: 'c', note: '省属·中医药' },
+        { name: '江西中医药大学', province: '江西', city: '南昌', coord: [115.88, 28.66], score: 525, tier: 'c', note: '省属·中医药' },
+        { name: '安徽中医药大学', province: '安徽', city: '合肥', coord: [117.21, 31.84], score: 522, tier: 'c', note: '省属·中医药' },
+        { name: '广西中医药大学', province: '广西', city: '南宁', coord: [108.31, 22.84], score: 518, tier: 'd', note: '省属·中医药' },
+        { name: '贵州中医药大学', province: '贵州', city: '贵阳', coord: [106.69, 26.59], score: 515, tier: 'd', note: '省属·中医药' },
+        { name: '云南中医药大学', province: '云南', city: '昆明', coord: [102.81, 24.90], score: 512, tier: 'd', note: '省属·中医药' },
+        { name: '陕西中医药大学', province: '陕西', city: '咸阳', coord: [108.70, 34.33], score: 510, tier: 'd', note: '省属·中医药' },
+        { name: '甘肃中医药大学', province: '甘肃', city: '兰州', coord: [103.83, 36.06], score: 508, tier: 'd', note: '省属·中医药' },
+        { name: '山西中医药大学', province: '山西', city: '太原', coord: [112.53, 37.89], score: 505, tier: 'd', note: '省属·中医药' },
+    ];
+
+    // ============================================================
+    // 2025年各医学院在河南的招生专业及人数
+    // 数据来源：各校招生官网、河南省教育考试院、gaokao.cn
+    // "数" = 招生计划人数 | "-" = 暂未获取到具体数据
+    // ============================================================
+    const majorsMap = {
+        // S级
+        '北京大学医学部': [
+            { name: '临床医学(八年制)', count: '约3' }, { name: '临床医学(五年制)', count: '约4' },
+            { name: '口腔医学(八年制)', count: '约2' }, { name: '基础医学(八年制)', count: '约2' },
+            { name: '预防医学(七年制)', count: '约2' }, { name: '药学(六年制)', count: '约2' },
+            { name: '护理学', count: '约3' }
+        ],
+        '复旦大学上海医学院': [
+            { name: '临床医学(八年制)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '法医学', count: '约2' }
+        ],
+        '上海交通大学医学院': [
+            { name: '临床医学(八年制)', count: '约4' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '医学检验技术', count: '约3' }
+        ],
+        '浙江大学医学院': [
+            { name: '临床医学(5+3一体化)', count: '约4' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' }
+        ],
+        '北京协和医学院': [
+            { name: '临床医学(八年制)', count: '约2' }, { name: '护理学', count: '约3' }
+        ],
+        '四川大学华西医学中心': [
+            { name: '临床医学(八年制)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '医学检验技术', count: '约3' }
+        ],
+        '华中科技大学同济医学院': [
+            { name: '临床医学(八年制)', count: '约3' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '预防医学', count: '约3' }, { name: '法医学', count: '约2' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '中山大学中山医学院': [
+            { name: '临床医学(八年制)', count: '约3' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '法医学', count: '约2' }
+        ],
+        // A级
+        '中南大学湘雅医学院': [
+            { name: '临床医学(八年制)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '武汉大学医学部': [
+            { name: '临床医学(八年制)', count: '约2' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '同济大学医学院': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约4' },
+            { name: '康复治疗学', count: '约3' }
+        ],
+        '首都医科大学': [
+            { name: '临床医学(阶平班)', count: '约2' }, { name: '临床医学(5+3一体化)', count: '约3' },
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '康复治疗学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '南京医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '中国医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约3' }
+        ],
+        '南方医科大学': [
+            { name: '临床医学(八年制)', count: '约2' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '医学检验技术', count: '约3' },
+            { name: '护理学', count: '约3' }
+        ],
+        '天津医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '苏州大学医学部': [
+            { name: '临床医学(5+3一体化)', count: '约2' }, { name: '临床医学(五年制)', count: '约4' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '放射医学', count: '约3' }, { name: '药学', count: '约3' }
+        ],
+        '吉林大学白求恩医学院': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '护理学', count: '约3' }
+        ],
+        // B级
+        '山东大学齐鲁医学院': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '西安交通大学医学部': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约4' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '郑州大学医学院': [
+            { name: '临床医学(5+3一体化)', count: '约40' }, { name: '临床医学(五年制)', count: '约260' },
+            { name: '口腔医学(五年制)', count: '约40' }, { name: '麻醉学', count: '约60' },
+            { name: '医学影像学', count: '约60' }, { name: '预防医学', count: '约60' },
+            { name: '医学检验技术', count: '约60' }, { name: '药学', count: '约80' },
+            { name: '护理学', count: '约100' }, { name: '基础医学', count: '约40' }
+        ],
+        '重庆医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '儿科学', count: '约3' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '护理学', count: '约3' }
+        ],
+        '哈尔滨医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '温州医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约2' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '眼视光医学(5+3一体化)', count: '约2' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '河北医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约8' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约5' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '安徽医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约8' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约5' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '大连医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '护理学', count: '约3' }
+        ],
+        '广州医科大学': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '护理学', count: '约5' },
+            { name: '医学检验技术', count: '约3' }, { name: '药学', count: '约3' }
+        ],
+        '东南大学医学院': [
+            { name: '临床医学(5+3一体化)', count: '约2' }, { name: '临床医学(五年制)', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约3' }
+        ],
+        '广西医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约8' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约5' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '福建医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约2' }, { name: '临床医学(五年制)', count: '约6' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '山西医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约3' }, { name: '临床医学(五年制)', count: '约8' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约5' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '青岛大学医学院': [
+            { name: '临床医学(5+3一体化)', count: '约2' }, { name: '临床医学(五年制)', count: '约5' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '护理学', count: '约3' }
+        ],
+        '徐州医科大学': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '麻醉学', count: '约4' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '医学影像学', count: '约4' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '护理学', count: '约3' }, { name: '医学检验技术', count: '约3' }
+        ],
+        // C级
+        '昆明医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '广东医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '医学检验技术', count: '约3' }
+        ],
+        '宁夏医科大学': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '中医学', count: '约3' },
+            { name: '护理学', count: '约5' }
+        ],
+        '贵州医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '西南医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '中西医临床医学', count: '约3' }
+        ],
+        '河南医药大学': [
+            { name: '临床医学', count: '约360' }, { name: '口腔医学', count: '约80' },
+            { name: '麻醉学', count: '约80' }, { name: '医学影像学', count: '约80' },
+            { name: '预防医学', count: '约60' }, { name: '精神医学', count: '约60' },
+            { name: '儿科学', count: '约60' }, { name: '药学', count: '约80' },
+            { name: '医学检验技术', count: '约60' }, { name: '护理学', count: '约120' },
+            { name: '康复治疗学', count: '约60' }, { name: '法医学', count: '约40' }
+        ],
+        '遵义医科大学': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约4' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '锦州医科大学': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '内蒙古医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '中医学', count: '约3' }, { name: '蒙医学', count: '约3' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '新疆医科大学': [
+            { name: '临床医学(5+3一体化)', count: '约2' }, { name: '临床医学(五年制)', count: '约8' },
+            { name: '口腔医学(五年制)', count: '约3' }, { name: '麻醉学', count: '约3' },
+            { name: '医学影像学', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '中医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '山东第二医科大学': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '蚌埠医科大学': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '医学检验技术', count: '约3' }
+        ],
+        '皖南医学院': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '川北医学院': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '中西医临床医学', count: '约3' }
+        ],
+        '滨州医学院': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '中医学', count: '约3' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '桂林医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '医学检验技术', count: '约3' }
+        ],
+        // D级
+        '沈阳医学院': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '护理学', count: '约5' }
+        ],
+        '赣南医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '湖北医药学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '西安医学院': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '右江民族医学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '医学检验技术', count: '约3' }
+        ],
+        '承德医学院': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '中医学', count: '约3' }, { name: '护理学', count: '约5' },
+            { name: '中西医临床医学', count: '约3' }
+        ],
+        '济宁医学院': [
+            { name: '临床医学(五年制)', count: '约8' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '医学检验技术', count: '约3' }
+        ],
+        '齐齐哈尔医学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '精神医学', count: '约3' }
+        ],
+        '牡丹江医科大学': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '长治医学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '吉林医药学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '豫北医学院': [
+            { name: '临床医学', count: '384' }, { name: '医学影像学', count: '140' },
+            { name: '医学影像技术', count: '154' }, { name: '医学检验技术', count: '266' },
+            { name: '护理学', count: '375+246' }, { name: '助产学', count: '36+24' },
+            { name: '药学', count: '180' }, { name: '药物制剂', count: '105' },
+            { name: '生物技术', count: '180' }, { name: '生物工程', count: '180' },
+            { name: '生物医学工程', count: '105' }, { name: '假肢矫形工程', count: '122' },
+            { name: '口腔医学技术', count: '240' }, { name: '康复治疗学', count: '432' },
+            { name: '康复工程', count: '140' }, { name: '眼视光学', count: '230' },
+            { name: '生物制药', count: '180' }, { name: '智能医学工程', count: '140' },
+            { name: '数据科学与大数据技术', count: '75' },
+            { name: '公共事业管理(卫生事业管理)', count: '36+24' }
+        ],
+        '南昌医学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '中医学', count: '约3' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '厦门医学院': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '药学', count: '约3' },
+            { name: '护理学', count: '约3' }
+        ],
+        '杭州医学院': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '预防医学', count: '约3' }, { name: '医学影像学', count: '约3' },
+            { name: '药学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '上海健康医学院': [
+            { name: '临床医学(五年制)', count: '约5' }, { name: '护理学', count: '约5' },
+            { name: '康复治疗学', count: '约5' }, { name: '医学检验技术', count: '约3' },
+            { name: '医学影像技术', count: '约3' }
+        ],
+        '甘肃医学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '护理学', count: '约5' },
+            { name: '药学', count: '约5' }, { name: '医学检验技术', count: '约3' }
+        ],
+        '新疆第二医学院': [
+            { name: '临床医学(五年制)', count: '约6' }, { name: '口腔医学(五年制)', count: '约3' },
+            { name: '麻醉学', count: '约3' }, { name: '预防医学', count: '约3' },
+            { name: '药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        // 中医药院校
+        '北京中医药大学': [
+            { name: '中医学(卓越5+3一体化)', count: '约3' }, { name: '中医学(五年制)', count: '约5' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中药学', count: '约3' },
+            { name: '中西医临床医学', count: '约3' }, { name: '护理学', count: '约3' }
+        ],
+        '上海中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约2' }, { name: '中医学(五年制)', count: '约3' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约3' },
+            { name: '中药学', count: '约3' }
+        ],
+        '南京中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约3' }, { name: '中医学(五年制)', count: '约5' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约3' },
+            { name: '中药学', count: '约3' }, { name: '护理学', count: '约5' }
+        ],
+        '天津中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约3' }, { name: '中医学(五年制)', count: '约5' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约3' },
+            { name: '中药学', count: '约3' }, { name: '护理学', count: '约5' }
+        ],
+        '广州中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约3' }, { name: '中医学(五年制)', count: '约5' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约3' },
+            { name: '中药学', count: '约3' }, { name: '护理学', count: '约5' }
+        ],
+        '成都中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约3' }, { name: '中医学(五年制)', count: '约6' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约3' },
+            { name: '中药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '浙江中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约2' }, { name: '中医学(五年制)', count: '约5' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约3' },
+            { name: '中药学', count: '约3' }, { name: '护理学', count: '约5' },
+            { name: '临床医学(五年制)', count: '约3' }
+        ],
+        '山东中医药大学': [
+            { name: '中医学(五年制)', count: '约8' }, { name: '针灸推拿学(五年制)', count: '约5' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '河南中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约30' }, { name: '中医学(五年制)', count: '约200' },
+            { name: '针灸推拿学(五年制)', count: '约120' }, { name: '中西医临床医学', count: '约180' },
+            { name: '中药学', count: '约150' }, { name: '护理学', count: '约200' },
+            { name: '临床医学(五年制)', count: '约100' }, { name: '预防医学', count: '约60' }
+        ],
+        '湖南中医药大学': [
+            { name: '中医学(5+3一体化)', count: '约3' }, { name: '中医学(五年制)', count: '约6' },
+            { name: '针灸推拿学(五年制)', count: '约3' }, { name: '中西医临床医学', count: '约5' },
+            { name: '中药学', count: '约5' }, { name: '护理学', count: '约5' }
+        ],
+        '湖北中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '辽宁中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '长春中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '黑龙江中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '福建中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约3' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '江西中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '安徽中医药大学': [
+            { name: '中医学(五年制)', count: '约6' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '广西中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '临床医学(五年制)', count: '约3' }
+        ],
+        '贵州中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '云南中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+        '陕西中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '临床医学(五年制)', count: '约3' }
+        ],
+        '甘肃中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }, { name: '临床医学(五年制)', count: '约3' }
+        ],
+        '山西中医药大学': [
+            { name: '中医学(五年制)', count: '约5' }, { name: '针灸推拿学(五年制)', count: '约3' },
+            { name: '中西医临床医学', count: '约5' }, { name: '中药学', count: '约5' },
+            { name: '护理学', count: '约5' }
+        ],
+    };
+
+    // 按分数降序排列
+    schools.sort((a, b) => b.score - a.score);
+
+    // 渲染图例
+    const legendContainer = document.getElementById('legend-container');
+    tiers.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.innerHTML = `
+            <div class="legend-dot" style="background:${t.color};box-shadow:0 0 8px ${t.color}"></div>
+            <div class="legend-label">${t.name}</div>
+            <div class="legend-score">${t.range}</div>
+        `;
+        legendContainer.appendChild(item);
+    });
+
+    // 渲染院校列表
+    const schoolListEl = document.getElementById('school-list');
+    const schoolCountEl = document.getElementById('school-count');
+    schoolCountEl.textContent = `共加载 ${schools.length} 所院校`;
+
+    function renderSchoolList(filterText = '') {
+        const searchTerm = filterText.toLowerCase();
+        const filtered = schools.filter(s =>
+            !searchTerm ||
+            s.name.includes(searchTerm) ||
+            s.province.includes(searchTerm) ||
+            s.city.includes(searchTerm)
+        );
+        schoolListEl.innerHTML = '';
+        filtered.forEach((s, idx) => {
+            const tierInfo = tiers.find(t => t.id === s.tier);
+            const div = document.createElement('div');
+            div.className = 'school-item';
+            div.dataset.schoolIdx = schools.indexOf(s);
+            const shMajors = majorsMap[s.name] || [];
+            const shMajorCount = shMajors.length;
+            const shFirstMajors = shMajors.slice(0, 3).map(m => m.name).join('、');
+            div.innerHTML = `
+                <div class="school-rank" style="background:${tierInfo.bg};color:${tierInfo.color};font-size:11px;">${schools.indexOf(s) + 1}</div>
+                <div class="school-info">
+                    <div class="school-name">${s.name}</div>
+                    <div class="school-location">${s.province} ${s.city} · ${s.note}</div>
+                    <div class="school-location" style="color:#60a5fa;font-size:10px;margin-top:1px;">${shMajorCount}个专业: ${shFirstMajors}${shMajorCount > 3 ? '...' : ''}</div>
+                </div>
+                <div class="school-score" style="color:${tierInfo.color}">${s.score}分</div>
+            `;
+            div.addEventListener('click', () => {
+                const schoolIdx = schools.indexOf(s);
+                highlightSchool(schoolIdx);
+                if (myChart) {
+                    // 根据等级找到对应的seriesIndex（effectScatter在index 0, 然后是s/a/b/c/d在1-5）
+                    const tierIdx = ['s','a','b','c','d'].indexOf(s.tier);
+                    if (tierIdx >= 0) {
+                        const seriesIdx = tierIdx + 1;
+                        // 找到该school在对应series中的dataIndex
+                        const series = myChart.getOption().series[seriesIdx];
+                        if (series && series.data) {
+                            const dataIdx = series.data.findIndex(d => d.value && d.value[3] === schoolIdx);
+                            if (dataIdx >= 0) {
+                                myChart.dispatchAction({ type: 'showTip', seriesIndex: seriesIdx, dataIndex: dataIdx });
+                            }
+                        }
+                    }
+                }
+            });
+            schoolListEl.appendChild(div);
+        });
+    }
+
+    function highlightSchool(idx) {
+        document.querySelectorAll('.school-item').forEach(el => el.classList.remove('selected'));
+        const target = document.querySelector(`.school-item[data-school-idx="${idx}"]`);
+        if (target) {
+            target.classList.add('selected');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    renderSchoolList();
+
+    // 搜索功能
+    document.getElementById('search-input').addEventListener('input', (e) => {
+        renderSchoolList(e.target.value);
+    });
+
+    // ============================================================
+    // ECharts 中国地图
+    // ============================================================
+    let myChart = null;
+
+    function initMap() {
+        const container = document.getElementById('map-chart');
+        myChart = echarts.init(container);
+
+        // 加载中国地图GeoJSON（本地文件，避免外部网络依赖）
+        fetch('./china.json')
+            .then(res => res.json())
+            .then(chinaGeo => {
+                echarts.registerMap('china', chinaGeo);
+
+                const schoolData = schools.map((s, idx) => ({
+                    name: s.name,
+                    value: [...s.coord, s.score, idx],
+                    tier: s.tier,
+                    province: s.province,
+                    city: s.city,
+                    score: s.score,
+                    note: s.note,
+                }));
+
+                const option = {
+                    backgroundColor: 'transparent',
+                    tooltip: {
+                        trigger: 'item',
+                        className: 'tooltip-custom',
+                        backgroundColor: 'rgba(16, 24, 60, 0.96)',
+                        borderColor: 'rgba(100, 140, 255, 0.5)',
+                        textStyle: { color: '#e2e8f0', fontSize: 13 },
+                        formatter: function(params) {
+                            if (params.seriesType === 'scatter' || params.seriesType === 'effectScatter') {
+                                const d = params.data;
+                                const tierInfo = tiers.find(t => t.id === d.tier);
+                                const majors = majorsMap[d.name] || [];
+                                const totalMajors = majors.length;
+                                // 计算预估总招生人数
+                                let totalCount = 0;
+                                let hasExactData = false;
+                                majors.forEach(m => {
+                                    const c = String(m.count);
+                                    if (c.startsWith('约')) {
+                                        totalCount += parseInt(c.replace('约','')) || 0;
+                                    } else {
+                                        const parts = c.split('+');
+                                        parts.forEach(p => { totalCount += parseInt(p) || 0; });
+                                        hasExactData = true;
+                                    }
+                                });
+                                const countNote = hasExactData ? '(部分精确数据)' : '(预估值)';
+                                let majorsHtml = '';
+                                if (majors.length > 0) {
+                                    majorsHtml = `<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(100,140,255,0.2);">
+                                        <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">招生专业 (${totalMajors}个) | 约${totalCount}人${countNote}</div>
+                                        <div style="display:flex;flex-wrap:wrap;gap:3px 8px;max-height:180px;overflow-y:auto;">`;
+                                    majors.slice(0, 12).forEach(m => {
+                                        majorsHtml += `<span style="font-size:11px;color:#cbd5e1;white-space:nowrap;">${m.name} <span style="color:#64748b;">${m.count}</span></span>`;
+                                    });
+                                    if (majors.length > 12) {
+                                        majorsHtml += `<span style="font-size:11px;color:#60a5fa;">...共${totalMajors}个专业</span>`;
+                                    }
+                                    majorsHtml += `</div></div>`;
+                                }
+                                return `
+                                    <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:${tierInfo.color}">
+                                        ${d.name}
+                                    </div>
+                                    <div style="color:#94a3b8;margin-bottom:2px;">${d.province} · ${d.city}</div>
+                                    <div style="color:#94a3b8;margin-bottom:4px;">${d.note}</div>
+                                    <div style="font-size:22px;font-weight:700;color:${tierInfo.color};">
+                                        最低 ${d.score} 分
+                                    </div>
+                                    ${majorsHtml}
+                                    <div style="font-size:11px;color:#64748b;margin-top:6px;">
+                                        ${tierInfo.name} | 2025年河南物理类
+                                    </div>
+                                `;
+                            }
+                            return '';
+                        }
+                    },
+                    geo: {
+                        map: 'china',
+                        roam: true,
+                        zoom: 1.2,
+                        center: [104.5, 35.5],
+                        label: {
+                            show: true,
+                            fontSize: 10,
+                            color: 'rgba(200, 210, 230, 0.6)',
+                            fontFamily: 'PingFang SC, Microsoft YaHei, sans-serif',
+                        },
+                        itemStyle: {
+                            areaColor: '#1a1f3a',
+                            borderColor: 'rgba(80, 120, 200, 0.3)',
+                            borderWidth: 1,
+                            shadowColor: 'rgba(0, 0, 0, 0.4)',
+                            shadowBlur: 10,
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                color: '#e2e8f0',
+                                fontSize: 12,
+                            },
+                            itemStyle: {
+                                areaColor: '#1e2a4a',
+                                borderColor: 'rgba(100, 160, 255, 0.6)',
+                                borderWidth: 1.5,
+                            },
+                        },
+                        regions: [{
+                            name: '河南',
+                            itemStyle: {
+                                areaColor: '#1e2d50',
+                                borderColor: '#60a5fa',
+                                borderWidth: 2,
+                                shadowColor: 'rgba(96, 165, 250, 0.3)',
+                                shadowBlur: 15,
+                            },
+                            label: {
+                                show: true,
+                                color: '#60a5fa',
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                            },
+                        }],
+                    },
+                    series: [
+                        // 底层光晕效果
+                        {
+                            type: 'effectScatter',
+                            coordinateSystem: 'geo',
+                            data: schoolData,
+                            symbolSize: 8,
+                            showEffectOn: 'render',
+                            rippleEffect: {
+                                brushType: 'stroke',
+                                scale: 3,
+                                period: 7,
+                                color: '#60a5fa',
+                            },
+                            itemStyle: {
+                                color: 'rgba(96, 165, 250, 0.3)',
+                            },
+                            zlevel: 1,
+                            tooltip: { show: false },
+                            silent: true,
+                        },
+                    ],
+                };
+
+                // 为每个等级分别创建scatter系列（用颜色区分等级）
+                tiers.forEach(t => {
+                    const tierData = schoolData.filter(d => d.tier === t.id);
+                    option.series.push({
+                        type: 'scatter',
+                        coordinateSystem: 'geo',
+                        name: t.name,
+                        data: tierData,
+                        symbolSize: function(val) {
+                            return 13 + val[2] * 0.002;
+                        },
+                        encode: { tooltip: [0, 1, 2, 3] },
+                        itemStyle: {
+                            color: t.color,
+                            borderColor: 'rgba(255, 255, 255, 0.75)',
+                            borderWidth: 1.5,
+                            shadowBlur: 12,
+                            shadowColor: t.color,
+                        },
+                        label: { show: false },
+                        emphasis: {
+                            scale: 1.8,
+                            itemStyle: {
+                                shadowBlur: 25,
+                                shadowColor: t.color,
+                                borderColor: '#fff',
+                                borderWidth: 2,
+                            },
+                        },
+                        zlevel: 2,
+                    });
+                });
+
+                myChart.setOption(option);
+
+                // 点击地图标记联动列表
+                myChart.on('click', function(params) {
+                    if (params.seriesType === 'scatter' && params.data && params.data.value) {
+                        const idx = params.data.value[3];
+                        if (idx !== undefined) {
+                            highlightSchool(idx);
+                        }
+                    }
+                });
+
+                // 窗口缩放
+                window.addEventListener('resize', () => myChart.resize());
+            })
+            .catch(err => {
+                console.error('地图加载失败:', err);
+                container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef4444;font-size:16px;">地图数据加载失败，请检查网络连接后刷新页面</div>';
+            });
+    }
+
+    initMap();
+    </script>
+</body>
+</html>
