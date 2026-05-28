@@ -15,7 +15,7 @@
 
         .legend-panel {
             position: absolute; top: 20px; right: 20px;
-            background: rgba(255,255,255,0.95); border-radius: 12px;
+            background: rgba(255,255,255,0.55); border-radius: 12px;
             padding: 16px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             z-index: 1000; min-width: 210px; backdrop-filter: blur(10px);
         }
@@ -346,14 +346,14 @@
 
         // ============ Marker 样式配置 ============
         const tierConfig = {
-            1: { color: '#c62828', label: '第一梯队（浦东顶尖）', icon: '★', size: 26 },
-            2: { color: '#e65100', label: '第二梯队（浦东市重点）', icon: '◆', size: 22 },
-            3: { color: '#1565c0', label: '第三梯队（区重点/特色）', icon: '●', size: 18 },
-            4: { color: '#2e7d32', label: '第四梯队（普通高中）', icon: '■', size: 16 },
-            5: { color: '#6a1b9a', label: '民办高中（浦东）', icon: '▲', size: 14 },
-            6: { color: '#f44336', label: '委属市重点（外区）', icon: '⬟', size: 28 },
-            7: { color: '#00897b', label: '外区优质高中', icon: '⬢', size: 20 },
-            8: { color: '#78909c', label: '外区民办/特色', icon: '⬠', size: 16 },
+            1: { color: '#c62828', label: '第一梯队（浦东顶尖）', icon: '★', size: 38 },
+            2: { color: '#e65100', label: '第二梯队（浦东市重点）', icon: '◆', size: 34 },
+            3: { color: '#1565c0', label: '第三梯队（区重点/特色）', icon: '●', size: 30 },
+            4: { color: '#2e7d32', label: '第四梯队（普通高中）', icon: '■', size: 26 },
+            5: { color: '#6a1b9a', label: '民办高中（浦东）', icon: '▲', size: 24 },
+            6: { color: '#f44336', label: '委属市重点（外区）', icon: '⬟', size: 40 },
+            7: { color: '#00897b', label: '外区优质高中', icon: '⬢', size: 32 },
+            8: { color: '#78909c', label: '外区民办/特色', icon: '⬠', size: 26 },
         };
 
         const markerGroups = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[] };
@@ -362,12 +362,13 @@
         function createIcon(tier) {
             const cfg = tierConfig[tier];
             const isOuter = tier >= 6;
-            const borderRadius = isOuter ? '4px' : '50%';
+            const borderRadius = isOuter ? '6px' : '50%';
+            const borderWidth = isOuter ? 3 : 4;
             return L.divIcon({
                 className: 'custom-marker',
-                html: `<div style="background:${cfg.color};color:white;width:${cfg.size}px;height:${cfg.size}px;border-radius:${borderRadius};display:flex;align-items:center;justify-content:center;font-size:${cfg.size*0.45}px;font-weight:bold;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;">${cfg.icon}</div>`,
-                iconSize: [cfg.size+6, cfg.size+6],
-                iconAnchor: [(cfg.size+6)/2, (cfg.size+6)/2],
+                html: `<div style="background:${cfg.color};color:white;width:${cfg.size}px;height:${cfg.size}px;border-radius:${borderRadius};display:flex;align-items:center;justify-content:center;font-size:${cfg.size*0.5}px;font-weight:bold;border:${borderWidth}px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.5), 0 0 0 2px rgba(0,0,0,0.2);cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,0.5);">${cfg.icon}</div>`,
+                iconSize: [cfg.size+12, cfg.size+12],
+                iconAnchor: [(cfg.size+12)/2, (cfg.size+12)/2],
             });
         }
 
