@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>上海浦东新区高中梯队地图</title>
-    <link rel="stylesheet" href="assets/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
@@ -12,37 +12,15 @@
 
         .legend-panel {
             position: absolute; top: 20px; right: 20px;
-            background: rgba(255,255,255,0.55); border-radius: 12px;
-            padding: 14px 18px; box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-            z-index: 1000; min-width: 210px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            max-height: 80vh; display: flex; flex-direction: column;
+            background: rgba(255,255,255,0.95); border-radius: 12px;
+            padding: 16px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 1000; min-width: 210px; backdrop-filter: blur(10px);
         }
-        .legend-panel h3 { font-size: 14px; margin-bottom: 10px; color: #1a1a2e; border-bottom: 1.5px solid rgba(0,0,0,0.1); padding-bottom: 8px; text-align: center; }
-        .legend-scroll { flex: 1; overflow-y: auto; max-height: 60vh; }
-        .legend-scroll::-webkit-scrollbar { width: 3px; }
-        .legend-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
-        .legend-item { display: flex; align-items: center; margin-bottom: 4px; font-size: 12px; cursor: pointer; padding: 5px 6px; border-radius: 6px; transition: background 0.2s; user-select: none; }
-        .legend-item:hover { background: rgba(0,0,0,0.06); }
-        .legend-item.active { background: rgba(0,0,0,0.08); }
-        .legend-color { width: 14px; height: 14px; border-radius: 50%; margin-right: 8px; border: 2px solid rgba(255,255,255,0.8); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .legend-count { margin-left: auto; color: #888; font-size: 11px; background: rgba(0,0,0,0.05); padding: 1px 7px; border-radius: 10px; }
-        .legend-item-label { flex: 1; }
-        .legend-toggle { font-size: 10px; color: #999; margin-left: 4px; transition: transform 0.2s; }
-        .legend-toggle.open { transform: rotate(90deg); }
-
-        /* 学校列表 */
-        .school-list-container {
-            display: none; margin-top: 4px; padding-left: 8px;
-            border-left: 2px solid rgba(0,0,0,0.08);
-        }
-        .school-list-container.show { display: block; }
-        .school-list-item {
-            padding: 4px 8px; font-size: 11px; color: #333; cursor: pointer;
-            border-radius: 4px; transition: background 0.15s; white-space: nowrap;
-        }
-        .school-list-item:hover { background: rgba(0,0,0,0.06); }
-        .school-list-item.active { background: rgba(0,0,0,0.1); font-weight: 600; }
-        .school-list-item .list-score { color: #999; font-size: 10px; margin-left: 6px; }
+        .legend-panel h3 { font-size: 15px; margin-bottom: 12px; color: #1a1a2e; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; text-align: center; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.2s; }
+        .legend-item:hover { background: #f0f0f5; }
+        .legend-color { width: 16px; height: 16px; border-radius: 50%; margin-right: 10px; border: 2px solid rgba(0,0,0,0.2); flex-shrink: 0; }
+        .legend-count { margin-left: auto; color: #888; font-size: 12px; background: #f0f0f5; padding: 1px 8px; border-radius: 10px; }
 
         .title-panel {
             position: absolute; top: 20px; left: 20px;
@@ -69,8 +47,14 @@
         }
         .school-popup .dist-box .dist-line { color: #333; }
         .school-popup .dist-box .dist-drive { color: #1565c0; font-weight: 600; }
-        .school-popup .dist-box .dist-metro { color: #00897b; font-weight: 600; font-size: 11px; margin-top: 2px; line-height: 1.4; }
         .school-popup .dist-box .dist-loading { color: #999; font-style: italic; }
+        .school-popup .metro-info {
+            margin-top: 8px; padding: 8px 10px;
+            background: linear-gradient(135deg, #e65100 0%, #ff8f00 100%);
+            border-radius: 8px; color: #fff;
+            font-size: 12px; line-height: 1.6;
+            box-shadow: 0 2px 6px rgba(230,81,0,0.3);
+        }
 
         .filter-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 4px; }
         .filter-badge.t1 { background: #ffebee; color: #c62828; }
@@ -118,62 +102,44 @@
     </div>
 
     <div class="legend-panel" id="legendPanel">
-        <h3>梯队图例</h3>
-        <div class="legend-scroll" id="legendScroll">
-            <div class="legend-item" data-tier="all" style="font-weight:600;">
-                <div class="legend-color" style="background:#333;"></div><span class="legend-item-label">全部学校</span>
-                <span class="legend-count" id="countAll">0</span>
-            </div>
-            <div class="legend-item" data-tier="1">
-                <div class="legend-color" style="background:#c62828;"></div><span class="legend-item-label">第一梯队（浦东顶尖）</span>
-                <span class="legend-count" id="countT1">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="1"></div>
-            <div class="legend-item" data-tier="2">
-                <div class="legend-color" style="background:#e65100;"></div><span class="legend-item-label">第二梯队（浦东市重点）</span>
-                <span class="legend-count" id="countT2">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="2"></div>
-            <div class="legend-item" data-tier="3">
-                <div class="legend-color" style="background:#1565c0;"></div><span class="legend-item-label">第三梯队（区重点/特色）</span>
-                <span class="legend-count" id="countT3">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="3"></div>
-            <div class="legend-item" data-tier="4">
-                <div class="legend-color" style="background:#2e7d32;"></div><span class="legend-item-label">第四梯队（普通高中）</span>
-                <span class="legend-count" id="countT4">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="4"></div>
-            <div class="legend-item" data-tier="5">
-                <div class="legend-color" style="background:#6a1b9a;"></div><span class="legend-item-label">民办高中（浦东）</span>
-                <span class="legend-count" id="countT5">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="5"></div>
-            <hr class="legend-divider">
-            <div class="legend-label">▼ 全市招生（外区可报考浦东生源）</div>
-            <div class="legend-item" data-tier="6">
-                <div class="legend-color" style="background:#f44336;"></div><span class="legend-item-label">委属市重点（外区）</span>
-                <span class="legend-count" id="countT6">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="6"></div>
-            <div class="legend-item" data-tier="7">
-                <div class="legend-color" style="background:#00897b;"></div><span class="legend-item-label">外区优质高中</span>
-                <span class="legend-count" id="countT7">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="7"></div>
-            <div class="legend-item" data-tier="8">
-                <div class="legend-color" style="background:#78909c;"></div><span class="legend-item-label">外区民办/特色</span>
-                <span class="legend-count" id="countT8">0</span>
-                <span class="legend-toggle">▶</span>
-            </div>
-            <div class="school-list-container" data-list-tier="8"></div>
+        <h3>梯队图例（点击筛选）</h3>
+        <div class="legend-item" data-tier="all" style="font-weight:600;">
+            <div class="legend-color" style="background:#333;"></div><span>全部学校</span>
+            <span class="legend-count" id="countAll">0</span>
+        </div>
+        <div class="legend-item" data-tier="1">
+            <div class="legend-color" style="background:#c62828;"></div><span>第一梯队（浦东顶尖）</span>
+            <span class="legend-count" id="countT1">0</span>
+        </div>
+        <div class="legend-item" data-tier="2">
+            <div class="legend-color" style="background:#e65100;"></div><span>第二梯队（浦东市重点）</span>
+            <span class="legend-count" id="countT2">0</span>
+        </div>
+        <div class="legend-item" data-tier="3">
+            <div class="legend-color" style="background:#1565c0;"></div><span>第三梯队（区重点/特色）</span>
+            <span class="legend-count" id="countT3">0</span>
+        </div>
+        <div class="legend-item" data-tier="4">
+            <div class="legend-color" style="background:#2e7d32;"></div><span>第四梯队（普通高中）</span>
+            <span class="legend-count" id="countT4">0</span>
+        </div>
+        <div class="legend-item" data-tier="5">
+            <div class="legend-color" style="background:#6a1b9a;"></div><span>民办高中（浦东）</span>
+            <span class="legend-count" id="countT5">0</span>
+        </div>
+        <hr class="legend-divider">
+        <div class="legend-label">▼ 全市招生（外区可报考浦东生源）</div>
+        <div class="legend-item" data-tier="6">
+            <div class="legend-color" style="background:#f44336; border-color:#b71c1c;"></div><span>委属市重点（外区）</span>
+            <span class="legend-count" id="countT6">0</span>
+        </div>
+        <div class="legend-item" data-tier="7">
+            <div class="legend-color" style="background:#00897b;"></div><span>外区优质高中</span>
+            <span class="legend-count" id="countT7">0</span>
+        </div>
+        <div class="legend-item" data-tier="8">
+            <div class="legend-color" style="background:#78909c;"></div><span>外区民办/特色</span>
+            <span class="legend-count" id="countT8">0</span>
         </div>
     </div>
 
@@ -183,117 +149,117 @@
 
     <div class="driving-status" id="drivingStatus">正在计算驾车距离...</div>
 
-    <script src="assets/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // ============ 起始点 ============
-        const START_POINT = { lat: 31.162, lng: 121.497, name: '西营南路67弄' };
+        const START_POINT = { lat: 31.1588, lng: 121.48515, name: '西营南路67弄' };
 
         // ============ 浦东新区高中数据 ============
         const schools = [
             // 第一梯队：顶尖市重点（委属+头部）
-            { name:"华东师范大学第二附属中学", lat:31.206, lng:121.618, tier:1, addr:"张江高科技园区晨晖路555号", score:"约708+", metro:"🚇 2号线广兰路→世纪大道换乘6号线至东方体育中心，约35分钟" },
-            { name:"上海市实验学校", lat:31.182, lng:121.523, tier:1, addr:"东明路300号", score:"约707+", metro:"🚇 6号线东明路直达东方体育中心，约12分钟" },
-            { name:"上海市建平中学", lat:31.243, lng:121.554, tier:1, addr:"崮山路517号", score:"699.5", metro:"🚇 6号线云山路直达东方体育中心，约20分钟" },
-            { name:"上海市进才中学", lat:31.228, lng:121.563, tier:1, addr:"杨高中路2788号", score:"696", metro:"🚇 9号线杨高中路→世纪大道换乘6号线至东方体育中心，约25分钟" },
-            { name:"上海市浦东复旦附中分校", lat:31.280, lng:121.640, tier:1, addr:"金睦路366号（曹路）", score:"697", metro:"🚇 9号线曹路→世纪大道换乘6号线至东方体育中心，约40分钟" },
-            { name:"上海师范大学附属中学", lat:31.155, lng:121.500, tier:1, addr:"浦星公路388号（三林）", score:"约698", metro:"🚇 8号线浦江线沈杜公路→东方体育中心，约20分钟" },
+            { name:"华东师范大学第二附属中学", lat:31.19958, lng:121.59156, tier:1, addr:"张江高科技园区晨晖路555号", score:"约708+", metro:"2号线张江高科→2号线至世纪大道换乘6号线至东方体育中心，约45分钟"  },
+            { name:"上海市实验学校", lat:31.18468, lng:121.50332, tier:1, addr:"东明路300号", score:"约707+", metro:"6号线东明路站直达东方体育中心，约15分钟"  },
+            { name:"上海市建平中学", lat:31.24573, lng:121.55622, tier:1, addr:"浦东新区崮山路517号", score:"699.5", metro:"6号线云山路站直达东方体育中心，约25分钟"  },
+            { name:"上海市进才中学", lat:31.228, lng:121.563, tier:1, addr:"浦东新区杨高中路2788号", score:"696", metro:"9号线杨高中路→9号线至世纪大道换乘6号线至东方体育中心，约30分钟"  },
+            { name:"上海市浦东复旦附中分校", lat:31.29069, lng:121.50623, tier:1, addr:"杨浦区国权路383号", score:"697", metro:"9号线台儿庄路→9号线至世纪大道换乘6号线至东方体育中心，约50分钟"   },
+            { name:"上海师范大学附属中学", lat:31.155, lng:121.5, tier:1, addr:"浦东新区浦星公路388号", score:"约698", metro:"8号线直达东方体育中心，约10分钟"  },
             // 第二梯队：市重点
-            { name:"上海中学东校", lat:30.898, lng:121.925, tier:2, addr:"环湖西三路1398号（临港）", score:"685", metro:"🚇 16号线临港大道→龙阳路换乘11号线至东方体育中心，约65分钟" },
-            { name:"上海市洋泾中学", lat:31.228, lng:121.528, tier:2, addr:"潍坊路111号", score:"682.5", metro:"🚇 6号线北洋泾路直达东方体育中心，约15分钟" },
-            { name:"上海市川沙中学", lat:31.195, lng:121.695, tier:2, addr:"新德路351号（川沙）", score:"680.5", metro:"🚇 2号线川沙→世纪大道换乘6号线至东方体育中心，约40分钟" },
-            { name:"上海南汇中学", lat:31.055, lng:121.765, tier:2, addr:"学海路288号（惠南）", score:"671.5", metro:"🚇 16号线惠南→龙阳路换乘11号线至东方体育中心，约45分钟" },
-            { name:"上海市高桥中学", lat:31.345, lng:121.568, tier:2, addr:"季景北路859号（高桥）", score:"669", metro:"🚇 6号线港城路直达东方体育中心，约30分钟" },
-            { name:"上海市建平中学筠溪分校", lat:31.178, lng:121.560, tier:2, addr:"北蔡地区（分校）", score:"689.5", metro:"🚇 13号线下南路→龙阳路换乘11号线至东方体育中心，约20分钟" },
-            { name:"上海市进才中学根林分校", lat:31.182, lng:121.555, tier:2, addr:"北蔡地区（分校）", score:"686.5", metro:"🚇 13号线北蔡→龙阳路换乘11号线至东方体育中心，约20分钟" },
+            { name:"上海中学东校", lat:30.91004, lng:121.91768, tier:2, addr:"浦东新区环湖西三路1398号", score:"685", metro:"16号线临港大道→16号线至龙阳路换乘11号线至东方体育中心，约65分钟"  },
+            { name:"上海市洋泾中学", lat:31.228, lng:121.528, tier:2, addr:"浦东新区潍坊路111号", score:"682.5", metro:"6号线源深体育中心站直达东方体育中心，约20分钟"  },
+            { name:"上海市川沙中学", lat:31.195, lng:121.695, tier:2, addr:"浦东新区新德路351号", score:"680.5", metro:"2号线川沙→2号线至世纪大道换乘6号线至东方体育中心，约50分钟"  },
+            { name:"上海南汇中学", lat:31.06195, lng:121.78226, tier:2, addr:"学海路288号（惠南）", score:"671.5", metro:"16号线惠南→16号线至龙阳路换乘11号线至东方体育中心，约45分钟"  },
+            { name:"上海市高桥中学", lat:31.34836, lng:121.58101, tier:2, addr:"浦东新区季景北路859号", score:"669", metro:"10号线高桥→10号线至港城路换乘6号线至东方体育中心，约50分钟"  },
+            { name:"上海市建平中学筠溪分校", lat:31.178, lng:121.560, tier:2, addr:"浦东新区南曹路1301号", score:"689.5", metro:"13号线北蔡→13号线至龙阳路换乘11号线至东方体育中心，约30分钟"    },
+            { name:"上海市进才中学根林分校", lat:31.182, lng:121.555, tier:2, addr:"浦东新区鹤涛路1250号", score:"686.5", metro:"13号线北蔡→13号线至龙阳路换乘11号线至东方体育中心，约30分钟"    },
             // 第三梯队：区重点 / 市特色高中
-            { name:"华东师范大学附属东昌中学", lat:31.240, lng:121.522, tier:3, addr:"栖霞路34号（陆家嘴）", score:"668", feature:"市特色高中", metro:"🚇 14号线陆家嘴→世纪大道换乘6号线至东方体育中心，约20分钟" },
-            { name:"上海海事大学附属北蔡高级中学", lat:31.186, lng:121.558, tier:3, addr:"莲园路246号（北蔡）", score:"661", feature:"市特色高中", metro:"🚇 13号线北蔡→龙阳路换乘11号线至东方体育中心，约20分钟" },
-            { name:"上海市香山中学", lat:31.235, lng:121.535, tier:3, addr:"灵山路1672弄（洋泾）", score:"612.5", feature:"市特色高中（美术）", metro:" 6号线德平路直达东方体育中心，约15分钟" },
-            { name:"上海市上南中学", lat:31.175, lng:121.499, tier:3, addr:"昌里路（上南）", score:"648", metro:"🚇 8号线成山路直达东方体育中心，约8分钟" },
-            { name:"上海市三林中学", lat:31.143, lng:121.508, tier:3, addr:"三林路658号", score:"636.5", metro:"🚇 8号线或11号线三林站直达东方体育中心，约6分钟" },
-            { name:"上海市杨思高级中学", lat:31.170, lng:121.503, tier:3, addr:"杨思路（杨思）", score:"628.5", metro:" 8号线杨思直达东方体育中心，约5分钟" },
-            { name:"上海市新川中学", lat:31.198, lng:121.690, tier:3, addr:"川沙新镇", score:"644.5", metro:"🚇 2号线川沙→世纪大道换乘6号线至东方体育中心，约40分钟" },
-            { name:"华东师范大学附属周浦中学", lat:31.118, lng:121.577, tier:3, addr:"周浦镇", score:"651", metro:"🚇 18号线周浦→龙阳路换乘11号线至东方体育中心，约30分钟" },
-            { name:"上海海洋大学附属大团高级中学", lat:31.010, lng:121.740, tier:3, addr:"大团镇", score:"603", metro:"🚇 16号线新场→龙阳路换乘11号线至东方体育中心，约50分钟" },
-            { name:"上海市新场中学", lat:31.043, lng:121.657, tier:3, addr:"新场镇", score:"578.5", metro:"🚇 16号线新场→龙阳路换乘11号线至东方体育中心，约45分钟" },
-            { name:"上海市文建中学", lat:31.207, lng:121.528, tier:3, addr:"浦建路（塘桥）", score:"598", metro:"🚇 4/6号线塘桥→东方体育中心，约10分钟" },
-            { name:"上海市陆行中学", lat:31.256, lng:121.585, tier:3, addr:"金桥路（金杨）", score:"637", metro:"🚇 6号线金桥路直达东方体育中心，约20分钟" },
-            { name:"上海市浦东中学", lat:31.195, lng:121.520, tier:3, addr:"高科西路（南码头）", score:"590", metro:"🚇 6/7号线高科西路→东方体育中心，约12分钟" },
-            { name:"上海立信会计金融学院附属高行中学", lat:31.280, lng:121.595, tier:3, addr:"行泰路（高行）", score:"629.5", metro:"🚇 12号线金京路→世纪大道换乘6号线至东方体育中心，约35分钟" },
-            { name:"上海市南汇第一中学", lat:31.052, lng:121.760, tier:3, addr:"惠南镇", score:"608", metro:"🚇 16号线惠南→龙阳路换乘11号线至东方体育中心，约45分钟" },
-            { name:"上海市建平世纪中学", lat:31.207, lng:121.545, tier:3, addr:"玉兰路（花木）", score:"622.5", metro:"🚇 2/16号线世纪大道换乘6号线至东方体育中心，约15分钟" },
-            { name:"上海交通大学附属中学浦东实验高中", lat:31.255, lng:121.608, tier:3, addr:"金桥地区", score:"604", metro:"🚇 6号线金桥路直达东方体育中心，约22分钟" },
-            { name:"华东理工大学附属浦东科技高级中学", lat:31.206, lng:121.610, tier:3, addr:"张江地区", score:"659", metro:"🚇 2号线张江高科→世纪大道换乘6号线至东方体育中心，约30分钟" },
-            { name:"上海市川沙中学友仁分校", lat:31.193, lng:121.700, tier:3, addr:"川沙新镇（分校）", score:"665", metro:"🚇 2号线川沙→世纪大道换乘6号线至东方体育中心，约40分钟" },
-            { name:"上海民办华曜浦东实验学校", lat:31.178, lng:121.558, tier:3, addr:"北蔡地区（民办-优质）", score:"661", metro:"🚇 13号线北蔡→龙阳路换乘11号线至东方体育中心，约20分钟" },
+            { name:"华东师范大学附属东昌中学", lat:31.23531, lng:121.51503, tier:3, addr:"栖霞路34号（陆家嘴）", score:"668", feature:"市特色高中", metro:"2号线东昌路→2号线至世纪大道换乘6号线至东方体育中心，约30分钟"  },
+            { name:"上海海事大学附属北蔡高级中学", lat:31.18704, lng:121.54836, tier:3, addr:"浦东新区莲园路246号", score:"661", feature:"市特色高中", metro:"13号线北蔡→13号线至龙阳路换乘11号线至东方体育中心，约30分钟"  },
+            { name:"上海市香山中学", lat:31.235, lng:121.535, tier:3, addr:"浦东新区灵山路1672弄", score:"612.5", feature:"市特色高中（美术）", metro:"6号线北洋泾路站直达东方体育中心，约20分钟"  },
+            { name:"上海市上南中学", lat:31.175, lng:121.499, tier:3, addr:"浦东新区昌里路93号", score:"648", metro:"8号线上南路直达东方体育中心，约12分钟"  },
+            { name:"上海市三林中学", lat:31.143, lng:121.508, tier:3, addr:"浦东新区三林路658号", score:"636.5", metro:"8号线三林站直达东方体育中心，约10分钟"  },
+            { name:"上海市杨思高级中学", lat:31.17, lng:121.503, tier:3, addr:"浦东新区杨思路301号", score:"628.5", metro:"8号线杨思站直达东方体育中心，约10分钟"  },
+            { name:"上海市新川中学", lat:31.19377, lng:121.67504, tier:3, addr:"浦东新区新德西路196号", score:"644.5", metro:"2号线川沙→2号线至世纪大道换乘6号线至东方体育中心，约50分钟"   },
+            { name:"华东师范大学附属周浦中学", lat:31.118, lng:121.577, tier:3, addr:"浦东新区周浦镇繁荣路188号", score:"651", metro:"18号线周浦→18号线至龙阳路换乘11号线至东方体育中心，约40分钟"    },
+            { name:"上海海洋大学附属大团高级中学", lat:31.03, lng:121.75, tier:3, addr:"浦东新区大团镇南芦公路999号", score:"603", metro:"16号线野生动物园→16号线至龙阳路换乘11号线至东方体育中心，约65分钟"   },
+            { name:"上海市新场中学", lat:31.05, lng:121.65, tier:3, addr:"浦东新区新场镇东后老街152号", score:"578.5", metro:"16号线新场站直达东方体育中心，约45分钟"   },
+            { name:"上海市文建中学", lat:31.207, lng:121.528, tier:3, addr:"浦东新区浦建路211弄9号", score:"598", metro:"4号线塘桥→4号线至世纪大道换乘6号线至东方体育中心，约30分钟"  },
+            { name:"上海市陆行中学", lat:31.256, lng:121.585, tier:3, addr:"浦东新区金桥路835号", score:"637", metro:"6号线云山路站直达东方体育中心，约30分钟"  },
+            { name:"上海市浦东中学", lat:31.18721, lng:121.51542, tier:3, addr:"浦东新区高科西路1105号", score:"590", metro:"6号线临沂新村站直达东方体育中心，约25分钟"  },
+            { name:"上海立信会计金融学院附属高行中学", lat:31.28, lng:121.595, tier:3, addr:"浦东新区行泰路210号", score:"629.5", metro:"12号线金京路→12号线至世纪大道换乘6号线至东方体育中心，约45分钟"  },
+            { name:"上海市南汇第一中学", lat:31.04366, lng:121.758, tier:3, addr:"浦东新区惠南镇卫星东路16号", score:"608", metro:"16号线惠南→16号线至龙阳路换乘11号线至东方体育中心，约45分钟"   },
+            { name:"上海市建平世纪中学", lat:31.20981, lng:121.5463, tier:3, addr:"浦东新区玉兰路356号", score:"622.5", metro:"2号线世纪公园→2号线至龙阳路换乘11号线至东方体育中心，约30分钟"  },
+            { name:"上海交通大学附属中学浦东实验高中", lat:31.24069, lng:121.52616, tier:3, addr:"浦东新区浦东大道830号", score:"604", metro:"6号线金桥路站直达东方体育中心，约30分钟"   },
+            { name:"华东理工大学附属浦东科技高级中学", lat:31.05, lng:121.76, tier:3, addr:"浦东新区惠南镇通济路929号", score:"659", metro:"2号线广兰路→2号线至世纪大道换乘6号线至东方体育中心，约40分钟"    },
+            { name:"上海市川沙中学友仁分校", lat:31.193, lng:121.700, tier:3, addr:"浦东新区妙川路981号", score:"665", metro:"2号线川沙→2号线至世纪大道换乘6号线至东方体育中心，约50分钟"  },
+            { name:"上海民办华曜浦东实验学校", lat:31.178, lng:121.558, tier:3, addr:"浦东新区川周公路2798号", score:"661", metro:"13号线北蔡→13号线至龙阳路换乘11号线至东方体育中心，约25分钟"    },
             // 第四梯队：普通高中
-            { name:"上海市泾南中学", lat:31.247, lng:121.548, tier:4, addr:"民生路（洋泾）", score:"574.5", metro:"🚇 6号线民生路直达东方体育中心，约18分钟" },
-            { name:"上海市沪新中学", lat:31.273, lng:121.580, tier:4, addr:"莱阳路（沪东）", score:"563.5", metro:"🚇 6号线东陆路直达东方体育中心，约22分钟" },
-            { name:"上海市育民中学", lat:31.348, lng:121.565, tier:4, addr:"高桥镇", score:"614.5", metro:"🚇 6号线港城路直达东方体育中心，约30分钟" },
-            { name:"上海第二工业大学附属龚路中学", lat:31.290, lng:121.675, tier:4, addr:"龚路（曹路）", score:"592.5", metro:" 9号线曹路→世纪大道换乘6号线至东方体育中心，约40分钟" },
-            { name:"上海市江镇中学", lat:31.158, lng:121.730, tier:4, addr:"江镇（祝桥）", score:"580.5", metro:"🚇 2号线远东大道→世纪大道换乘6号线至东方体育中心，约45分钟" },
-            { name:"华东师范大学张江实验中学", lat:31.202, lng:121.625, tier:4, addr:"张江镇", score:"616.5", metro:" 2号线广兰路→世纪大道换乘6号线至东方体育中心，约30分钟" },
-            { name:"上海市三林中学东校", lat:31.137, lng:121.515, tier:4, addr:"三林镇（东校）", score:"573.5", metro:" 11号线三林直达东方体育中心，约8分钟" },
-            { name:"上海市高东中学", lat:31.323, lng:121.595, tier:4, addr:"高东镇", score:"566.5", metro:"🚇 10号线高桥→港城路换乘6号线至东方体育中心，约35分钟" },
-            { name:"上海市祝桥高级中学", lat:31.115, lng:121.770, tier:4, addr:"祝桥镇", score:"565", metro:"🚇 2号线远东大道→世纪大道换乘6号线至东方体育中心，约50分钟" },
-            { name:"上海市老港中学", lat:31.045, lng:121.850, tier:4, addr:"老港镇", score:"551.5", metro:"🚇 16号线新场→龙阳路换乘11号线至东方体育中心，约60分钟" },
-            { name:"上海市泥城中学", lat:30.985, lng:121.810, tier:4, addr:"泥城镇", score:"543", metro:"🚇 16号线滴水湖→龙阳路换乘11号线至东方体育中心，约75分钟" },
-            { name:"上海市吴迅中学", lat:31.112, lng:121.580, tier:4, addr:"周浦镇", score:"558.5", metro:"🚇 18号线周浦→龙阳路换乘11号线至东方体育中心，约30分钟" },
-            { name:"上海市长岛中学", lat:31.273, lng:121.583, tier:4, addr:"长岛路（浦兴）", score:"581", metro:"🚇 6号线博兴路直达东方体育中心，约22分钟" },
+            { name:"上海市泾南中学", lat:31.247, lng:121.548, tier:4, addr:"浦东新区民生路303号", score:"574.5", metro:"6号线民生路站直达东方体育中心，约20分钟"  },
+            { name:"上海市沪新中学", lat:31.273, lng:121.58, tier:4, addr:"浦东新区莱阳路224号", score:"563.5", metro:"12号线巨峰路→12号线至世纪大道换乘6号线至东方体育中心，约40分钟"  },
+            { name:"上海市育民中学", lat:31.3485, lng:121.58774, tier:4, addr:"浦东新区高桥西街217号", score:"614.5", metro:"10号线高桥→10号线至港城路换乘6号线至东方体育中心，约50分钟"   },
+            { name:"上海第二工业大学附属龚路中学", lat:31.2654, lng:121.67865, tier:4, addr:"浦东新区曹路镇龚路北街50号", score:"592.5", metro:"9号线曹路→9号线至世纪大道换乘6号线至东方体育中心，约50分钟"   },
+            { name:"上海市江镇中学", lat:31.158, lng:121.73, tier:4, addr:"浦东新区祝桥镇东亭路631号", score:"580.5", metro:"2号线远东大道→2号线至龙阳路换乘11号线至东方体育中心，约55分钟"    },
+            { name:"华东师范大学张江实验中学", lat:31.202, lng:121.625, tier:4, addr:"浦东新区张江镇江东路54号", score:"616.5", metro:"2号线张江高科→2号线至世纪大道换乘6号线至东方体育中心，约40分钟"    },
+            { name:"上海市三林中学东校", lat:31.137, lng:121.515, tier:4, addr:"浦东新区南林路733号", score:"573.5", metro:"8号线三林站直达东方体育中心，约10分钟"    },
+            { name:"上海市高东中学", lat:31.32952, lng:121.6202, tier:4, addr:"浦东新区光明路476号", score:"566.5", metro:"10号线基隆路→10号线至港城路换乘6号线至东方体育中心，约50分钟"    },
+            { name:"上海市祝桥高级中学", lat:31.11458, lng:121.75629, tier:4, addr:"浦东新区祝桥镇川南奉公路5062号", score:"565", metro:"2号线远东大道→2号线至龙阳路换乘11号线至东方体育中心，约55分钟"   },
+            { name:"上海市老港中学", lat:31.02664, lng:121.84485, tier:4, addr:"浦东新区老港镇建中路1001号", score:"551.5", metro:"16号线临港大道→16号线至龙阳路换乘11号线至东方体育中心，约70分钟"   },
+            { name:"上海市泥城中学", lat:30.90411, lng:121.82931, tier:4, addr:"浦东新区泥城镇泥城路6号", score:"543", metro:"16号线临港大道→16号线至龙阳路换乘11号线至东方体育中心，约70分钟"   },
+            { name:"上海市吴迅中学", lat:31.112, lng:121.58, tier:4, addr:"浦东新区周浦镇瑞和路578号", score:"558.5", metro:"18号线周浦→18号线至龙阳路换乘11号线至东方体育中心，约40分钟"   },
+            { name:"上海市长岛中学", lat:31.273, lng:121.583, tier:4, addr:"长岛路（浦兴）", score:"581", metro:"6号线博兴路站直达东方体育中心，约35分钟" },
             // 第五梯队：民办高中
-            { name:"上海民办光华中学", lat:31.198, lng:121.710, tier:5, addr:"川沙新镇", score:"589", metro:"2号线川沙，步行约800米，约40分钟" },
-            { name:"上海市民办尚德实验学校", lat:31.150, lng:121.570, tier:5, addr:"康桥镇秀沿路", score:"619", metro:"11号线秀沿路，步行约600米，约20分钟" },
-            { name:"上海市民办金苹果学校", lat:31.262, lng:121.602, tier:5, addr:"巨峰路（金桥）", score:"518.5", metro:"6号线巨峰路，步行约400米，约20分钟" },
-            { name:"上海浦东新区民办东鼎外国语学校", lat:31.050, lng:121.765, tier:5, addr:"惠南镇", score:"519.5", metro:"16号线惠南，步行约1公里，约45分钟" },
-            { name:"上海浦东新区民办万科学校", lat:31.148, lng:121.575, tier:5, addr:"康桥镇", score:"522.5", metro:"18号线周浦，步行约1.2公里，约25分钟" },
-            { name:"上海浦东新区民办惠立学校", lat:31.165, lng:121.485, tier:5, addr:"前滩", score:"519", metro:"11号线东方体育中心，步行约500米，约5分钟" },
-            { name:"上海浦东新区民办宏文学校", lat:31.202, lng:121.718, tier:5, addr:"川沙新镇", score:"519.5", metro:"2号线川沙，步行约1公里，约40分钟" },
-            { name:"上海浦东民办未来科技学校", lat:31.202, lng:121.615, tier:5, addr:"张江地区", score:"607", metro:"2号线广兰路，步行约600米，约30分钟" },
-            { name:"上海浦东新区民办康德学校", lat:31.145, lng:121.578, tier:5, addr:"康桥镇", score:"521.5", metro:"18号线周浦，步行约1公里，约25分钟" },
-            { name:"上海市浦东新区民办浦实高级中学", lat:31.140, lng:121.510, tier:5, addr:"三林地区", score:"518", metro:"11号线三林，步行约600米，约8分钟" },
-            { name:"上海市民办育辛高级中学", lat:31.053, lng:121.758, tier:5, addr:"惠南镇", score:"531", metro:"16号线惠南，步行约800米，约45分钟" },
-            { name:"上海市民办丰华高级中学", lat:31.260, lng:121.598, tier:5, addr:"金桥地区", score:"524.5", metro:"6号线巨峰路，步行约800米，约22分钟" },
-            { name:"民办上海工商外国语职业学院附属中学", lat:31.048, lng:121.763, tier:5, addr:"惠南镇", score:"518", metro:"16号线惠南，步行约1公里，约45分钟" },
-            { name:"上海浦东新区民办沪港学校", lat:30.908, lng:121.918, tier:5, addr:"临港新片区", score:"568.5", metro:"16号线滴水湖，步行约1.5公里，约65分钟" },
+            { name:"上海民办光华中学", lat:31.198, lng:121.71, tier:5, addr:"浦东新区川周公路2800号", score:"589", metro:"2号线川沙→2号线至世纪大道换乘6号线至东方体育中心，约50分钟"    },
+            { name:"上海市民办尚德实验学校", lat:31.1377, lng:121.5963, tier:5, addr:"浦东新区秀沿路1688号", score:"619", metro:"11号线秀沿路直达东方体育中心，约20分钟"   },
+            { name:"上海市民办金苹果学校", lat:31.27974, lng:121.61969, tier:5, addr:"浦东新区巨峰路1555号", score:"518.5", metro:"12号线巨峰路→12号线至世纪大道换乘6号线至东方体育中心，约40分钟"   },
+            { name:"上海浦东新区民办东鼎外国语学校", lat:31.05, lng:121.765, tier:5, addr:"浦东新区惠南镇观海路699号", score:"519.5", metro:"16号线惠南→16号线至龙阳路换乘11号线至东方体育中心，约45分钟"    },
+            { name:"上海浦东新区民办万科学校", lat:31.148, lng:121.575, tier:5, addr:"浦东新区康桥路1700弄", score:"522.5", metro:"11号线御桥→11号线直达东方体育中心，约20分钟"    },
+            { name:"上海浦东新区民办惠立学校", lat:31.165, lng:121.485, tier:5, addr:"浦东新区林耀路235号", score:"519", metro:"6号线/11号线东方体育中心站步行可达，约10分钟"    },
+            { name:"上海浦东新区民办宏文学校", lat:31.22, lng:121.69, tier:5, addr:"浦东新区川大路318号", score:"519.5", metro:"2号线川沙→2号线至世纪大道换乘6号线至东方体育中心，约50分钟"   },
+            { name:"上海浦东民办未来科技学校", lat:31.202, lng:121.615, tier:5, addr:"浦东新区周浦镇沈横路1号", score:"607", metro:"2号线张江高科→2号线至世纪大道换乘6号线至东方体育中心，约40分钟"    },
+            { name:"上海浦东新区民办康德学校", lat:31.145, lng:121.578, tier:5, addr:"浦东新区康恒路70号", score:"521.5", metro:"11号线御桥→11号线直达东方体育中心，约20分钟"    },
+            { name:"上海市浦东新区民办浦实高级中学", lat:31.22, lng:121.66, tier:5, addr:"浦东新区唐陆公路3892号", score:"518", metro:"8号线三林站直达东方体育中心，约10分钟"    },
+            { name:"上海市民办育辛高级中学", lat:31.21, lng:121.51, tier:5, addr:"浦东新区浦三路385号", score:"531", metro:"16号线惠南→16号线至龙阳路换乘11号线至东方体育中心，约45分钟"    },
+            { name:"上海市民办丰华高级中学", lat:31.27094, lng:121.60116, tier:5, addr:"浦东新区凌河路420弄88号", score:"524.5", metro:"6号线金桥路→6号线至世纪大道换乘至东方体育中心，约35分钟"   },
+            { name:"民办上海工商外国语职业学院附属中学", lat:31.048, lng:121.763, tier:5, addr:"浦东新区惠南镇勤奋路228号", score:"518", metro:"16号线惠南→16号线至龙阳路换乘11号线至东方体育中心，约45分钟"   },
+            { name:"上海浦东新区民办沪港学校", lat:30.88396, lng:121.89106, tier:5, addr:"浦东新区银莲路2号", score:"568.5", metro:"16号线滴水湖→16号线至龙阳路换乘11号线至东方体育中心，约75分钟"   },
 
             // ====== 外区高中（全市招生，浦东生源可报考） ======
             // 来源：2025年浦东新区"1至15志愿"统一招生录取分数线
             // Tier 6：委属市重点（全市招生）
-            { name:"[委属] 上海市上海中学", lat:31.137, lng:121.428, tier:6, addr:"徐汇区上中路400号", score:"706.5", district:"徐汇", metro:"11号线上海游泳馆，步行约800米，约15分钟" },
-            { name:"[委属] 复旦大学附属中学", lat:31.298, lng:121.505, tier:6, addr:"杨浦区国权路383号", score:"706.5", district:"杨浦", metro:"10号线江湾体育场，步行约1公里，约35分钟" },
-            { name:"[委属] 上海交通大学附属中学", lat:31.326, lng:121.490, tier:6, addr:"杨浦区殷高路42号", score:"706.5", district:"杨浦", metro:"3号线殷高西路，步行约600米，约40分钟" },
+            { name:"[委属] 上海市上海中学", lat:31.14201, lng:121.43036, tier:6, addr:"徐汇区上中路400号", score:"706.5", district:"徐汇", metro:"11号线上海游泳馆→11号线直达东方体育中心，约20分钟"  },
+            { name:"[委属] 复旦大学附属中学", lat:31.298, lng:121.505, tier:6, addr:"杨浦区国权路383号", score:"706.5", district:"杨浦", metro:"10号线国权路→10号线至天潼路换乘11号线至东方体育中心，约50分钟" },
+            { name:"[委属] 上海交通大学附属中学", lat:31.326, lng:121.490, tier:6, addr:"杨浦区殷高路42号", score:"706.5", district:"杨浦", metro:"3号线殷高西路→3号线至虹桥路换乘11号线至东方体育中心，约55分钟" },
             // Tier 7：外区优质高中（录取分≥630）
-            { name:"宋庆龄学校", lat:31.160, lng:121.193, tier:7, addr:"青浦区赵巷镇业辉路2号", score:"681", district:"青浦", metro:"17号线赵巷，步行约1公里，约55分钟" },
-            { name:"宝山世外", lat:31.405, lng:121.492, tier:7, addr:"宝山区", score:"672.5", district:"宝山", metro:"7号线美兰湖，步行约1.5公里，约50分钟" },
-
-            { name:"领科双语学校", lat:31.133, lng:121.318, tier:7, addr:"松江区涞亭南路559号", score:"652.5", district:"松江", metro:"9号线九亭，步行约1公里，约50分钟" },
-            { name:"文来中学", lat:31.157, lng:121.357, tier:7, addr:"闵行区七宝镇农南路66号", score:"652", district:"闵行", metro:"9号线七宝，步行约800米，约45分钟" },
-            { name:"金山世外", lat:30.742, lng:121.345, tier:7, addr:"金山区", score:"641", district:"金山", metro:"金山铁路金山卫，步行约1公里，约80分钟" },
-            { name:"田家炳中学", lat:31.275, lng:121.440, tier:7, addr:"静安区景凤路185号", score:"639", district:"静安", metro:"1号线共康路，步行约600米，约40分钟" },
-            { name:"青浦世外", lat:31.152, lng:121.125, tier:7, addr:"青浦区", score:"638", district:"青浦", metro:"17号线青浦新城，步行约1.5公里，约65分钟" },
-            { name:"存志高级中学", lat:31.315, lng:121.495, tier:7, addr:"宝山区", score:"634.5", district:"宝山", metro:"7号线美兰湖，步行约1公里，约45分钟" },
-            { name:"宝山华曜", lat:31.390, lng:121.482, tier:7, addr:"宝山区", score:"633", district:"宝山", metro:"7号线美兰湖，步行约2公里，约50分钟" },
-            { name:"同济创意中学", lat:31.230, lng:121.480, tier:7, addr:"黄浦区", score:"630", district:"黄浦", metro:"8号线西藏南路，步行约400米，约25分钟" },
+            { name:"宋庆龄学校", lat:31.16, lng:121.193, tier:7, addr:"青浦区赵巷镇业辉路2号", score:"681", district:"青浦", metro:"17号线赵巷→17号线至虹桥火车站换乘2号线至世纪大道换乘6号线至东方体育中心，约75分钟"  },
+            { name:"宝山世外", lat:31.3598, lng:121.37984, tier:7, addr:"宝山区云上路29号", score:"672.5", district:"宝山", metro:"7号线顾村公园→7号线至静安寺换乘11号线至东方体育中心，约50分钟"    },
+            { name:"五爱高级中学", lat:31.204, lng:121.492, tier:7, addr:"黄浦区制造局路666号", score:"655.5", district:"黄浦", metro:"8号线西藏南路直达东方体育中心，约25分钟"  },
+            { name:"领科双语学校", lat:31.12974, lng:121.34048, tier:7, addr:"松江区涞亭南路559号", score:"652.5", district:"松江", metro:"9号线九亭→9号线至世纪大道换乘6号线至东方体育中心，约60分钟"  },
+            { name:"文来中学", lat:31.15185, lng:121.35963, tier:7, addr:"闵行区农南路66号", score:"652", district:"闵行", metro:"9号线七宝→9号线至世纪大道换乘6号线至东方体育中心，约55分钟"  },
+            { name:"金山世外", lat:30.75346, lng:121.33302, tier:7, addr:"金山区龙皓路1388号", score:"641", district:"金山", metro:"金山铁路至上海南站→1号线至徐家汇换乘11号线至东方体育中心，约85分钟"   },
+            { name:"田家炳中学", lat:31.32024, lng:121.46315, tier:7, addr:"静安区景凤路185号", score:"639", district:"静安", metro:"1号线共康路→1号线至徐家汇换乘11号线至东方体育中心，约45分钟"  },
+            { name:"青浦世外", lat:31.15, lng:121.12, tier:7, addr:"青浦区龙联路915号", score:"638", district:"青浦", metro:"17号线朱家角→17号线至虹桥火车站换乘2号线至世纪大道换乘6号线至东方体育中心，约80分钟"   },
+            { name:"存志高级中学", lat:31.315, lng:121.495, tier:7, addr:"宝山区苏家浜路211号", score:"634.5", district:"宝山", metro:"3号线殷高西路→3号线至虹桥路换乘11号线至东方体育中心，约50分钟"    },
+            { name:"宝山华曜", lat:31.39, lng:121.482, tier:7, addr:"宝山区鄱阳湖路635号", score:"633", district:"宝山", metro:"7号线顾村公园→7号线至静安寺换乘11号线至东方体育中心，约50分钟"    },
+            { name:"同济创意中学", lat:31.23, lng:121.48, tier:7, addr:"黄浦区四川中路599号", score:"630", district:"黄浦", metro:"8号线→8号线直达东方体育中心，约30分钟"    },
             // Tier 8：外区民办/特色高中
-            { name:"维尚高级中学", lat:31.335, lng:121.500, tier:8, addr:"宝山区", score:"610", district:"宝山", metro:"7号线美兰湖，步行约2公里，约45分钟" },
-            { name:"科德高级中学", lat:31.030, lng:121.230, tier:8, addr:"松江区", score:"609", district:"松江", metro:"9号线松江新城，步行约1.5公里，约60分钟" },
-            { name:"燎原双语学校", lat:31.120, lng:121.390, tier:8, addr:"闵行区", score:"588", district:"闵行", metro:"9号线合川路，步行约500米，约40分钟" },
-            { name:"宏润博源学校", lat:31.148, lng:121.208, tier:8, addr:"青浦区", score:"584.5", district:"青浦", metro:"17号线赵巷，步行约1公里，约55分钟" },
-            { name:"交大南洋中学", lat:30.740, lng:121.340, tier:8, addr:"金山区", score:"582.5", district:"金山", metro:"金山铁路金山卫，步行约2公里，约80分钟" },
-            { name:"上戏附中", lat:31.230, lng:121.445, tier:8, addr:"静安区", score:"577.5", district:"静安", metro:"1号线上海马戏城，步行约600米，约30分钟" },
-            { name:"博华双语学校", lat:30.920, lng:121.470, tier:8, addr:"奉贤区", score:"567.5", district:"奉贤", metro:"5号线奉贤新城，步行约1.5公里，约55分钟" },
-            { name:"青浦协和双语", lat:31.155, lng:121.118, tier:8, addr:"青浦区", score:"559.5", district:"青浦", metro:"17号线青浦新城，步行约2公里，约65分钟" },
-            { name:"西外外国语学校", lat:31.045, lng:121.210, tier:8, addr:"松江区", score:"558.5", district:"松江", metro:"9号线松江新城，步行约2公里，约60分钟" },
-            { name:"赫贤学校", lat:31.052, lng:121.230, tier:8, addr:"松江区", score:"558.5", district:"松江", metro:"9号线松江新城，步行约1.5公里，约60分钟" },
-            { name:"上音安师实验中学", lat:31.255, lng:121.415, tier:8, addr:"普陀区", score:"557", district:"普陀", metro:"11号线枫桥路，步行约600米，约35分钟" },
-            { name:"华盛怀少学校", lat:31.385, lng:121.257, tier:8, addr:"嘉定区", score:"548", district:"嘉定", metro:"11号线嘉定北，步行约1公里，约55分钟" },
-            { name:"同洲模范学校", lat:31.330, lng:121.475, tier:8, addr:"宝山区", score:"540", district:"宝山", metro:"7号线美兰湖，步行约2公里，约45分钟" },
-            { name:"永昌中学", lat:30.738, lng:121.350, tier:8, addr:"金山区", score:"529", district:"金山", metro:"金山铁路金山卫，步行约1.5公里，约80分钟" },
-            { name:"行中中学", lat:31.395, lng:121.500, tier:8, addr:"宝山区", score:"526", district:"宝山", metro:"7号线美兰湖，步行约2公里，约50分钟" },
-            { name:"美达菲双语学校", lat:30.918, lng:121.465, tier:8, addr:"奉贤区", score:"524.5", district:"奉贤", metro:"5号线奉贤新城，步行约2公里，约55分钟" },
-            { name:"安生学校", lat:31.248, lng:121.410, tier:8, addr:"普陀区", score:"521", district:"普陀", metro:"11号线枫桥路，步行约800米，约35分钟" },
-            { name:"创艺高级中学", lat:31.310, lng:121.490, tier:8, addr:"宝山区", score:"521", district:"宝山", metro:"7号线美兰湖，步行约2公里，约45分钟" },
-            { name:"民一中学", lat:31.623, lng:121.405, tier:8, addr:"崇明区", score:"514", district:"崇明", metro:"崇明线暂无，建议轮渡+地铁，约90分钟" },
+            { name:"维尚高级中学", lat:31.37962, lng:121.49026, tier:8, addr:"宝山区同济路299号", score:"610", district:"宝山", metro:"3号线长江南路→3号线至虹桥路换乘11号线至东方体育中心，约50分钟"   },
+            { name:"科德高级中学", lat:31.03, lng:121.23, tier:8, addr:"松江区外青松公路9488号", score:"609", district:"松江", metro:"9号线松江新城→9号线至世纪大道换乘6号线至东方体育中心，约70分钟"    },
+            { name:"燎原双语学校", lat:31.14393, lng:121.40686, tier:8, addr:"闵行区平阳路150号", score:"588", district:"闵行", metro:"12号线虹梅路→12号线至世纪大道换乘6号线至东方体育中心，约50分钟"   },
+            { name:"宏润博源学校", lat:31.148, lng:121.208, tier:8, addr:"青浦区课植园路178号", score:"584.5", district:"青浦", metro:"17号线蟠龙路→17号线至虹桥火车站换乘2号线至世纪大道换乘6号线至东方体育中心，约75分钟"    },
+            { name:"交大南洋中学", lat:30.74, lng:121.34, tier:8, addr:"金山区松隐大街100号", score:"582.5", district:"金山", metro:"金山铁路至上海南站→1号线至徐家汇换乘11号线至东方体育中心，约80分钟"    },
+            { name:"上戏附中", lat:31.23245, lng:121.44202, tier:8, addr:"静安区康定路770号", score:"577.5", district:"静安", metro:"7号线静安寺→7号线至龙阳路换乘11号线至东方体育中心，约40分钟"    },
+            { name:"博华双语学校", lat:30.92, lng:121.47, tier:8, addr:"奉贤区八字桥路686号", score:"567.5", district:"奉贤", metro:"5号线环城东路→5号线至东川路换乘1号线至徐家汇换乘11号线至东方体育中心，约75分钟"    },
+            { name:"青浦协和双语", lat:31.12562, lng:121.23545, tier:8, addr:"青浦区业锦路32号", score:"559.5", district:"青浦", metro:"17号线朱家角→17号线至虹桥火车站换乘2号线至世纪大道换乘6号线至东方体育中心，约80分钟"   },
+            { name:"西外外国语学校", lat:31.04876, lng:121.22802, tier:8, addr:"松江区文翔路1100号", score:"558.5", district:"松江", metro:"9号线松江大学城→9号线至世纪大道换乘6号线至东方体育中心，约65分钟"   },
+            { name:"赫贤学校", lat:31.03892, lng:121.24959, tier:8, addr:"松江区茸北路336号", score:"558.5", district:"松江", metro:"9号线松江新城→9号线至世纪大道换乘6号线至东方体育中心，约65分钟"   },
+            { name:"上音安师实验中学", lat:31.23849, lng:121.4251, tier:8, addr:"普陀区武宁路48号", score:"557", district:"普陀", metro:"15号线上海西站→15号线至龙阳路换乘11号线至东方体育中心，约50分钟"   },
+            { name:"华盛怀少学校", lat:31.29849, lng:121.30932, tier:8, addr:"嘉定区古猗园路718号", score:"548", district:"嘉定", metro:"11号线嘉定北→11号线直达东方体育中心，约60分钟"   },
+            { name:"同洲模范学校", lat:31.32334, lng:121.46254, tier:8, addr:"宝山区共康东路188号", score:"540", district:"宝山", metro:"7号线美兰湖→7号线至龙阳路换乘11号线至东方体育中心，约50分钟"   },
+            { name:"永昌中学", lat:30.738, lng:121.35, tier:8, addr:"金山区山富西路99号", score:"529", district:"金山", metro:"金山铁路至上海南站→1号线至徐家汇换乘11号线至东方体育中心，约80分钟"    },
+            { name:"行中中学", lat:31.41983, lng:121.4302, tier:8, addr:"宝山区塘南街52号", score:"526", district:"宝山", metro:"3号线友谊路→3号线至虹桥路换乘11号线至东方体育中心，约50分钟"   },
+            { name:"美达菲双语学校", lat:30.9706, lng:121.47618, tier:8, addr:"奉贤区汇丰北路799号", score:"524.5", district:"奉贤", metro:"5号线环城东路→5号线至东川路换乘1号线至徐家汇换乘11号线至东方体育中心，约75分钟"    },
+            { name:"安生学校", lat:31.27667, lng:121.38125, tier:8, addr:"普陀区桃清路58号", score:"521", district:"普陀", metro:"15号线上海西站→15号线至龙阳路换乘11号线至东方体育中心，约45分钟"    },
+            { name:"创艺高级中学", lat:31.4383, lng:121.36065, tier:8, addr:"宝山区潘泾路3039号", score:"521", district:"宝山", metro:"3号线殷高西路→3号线至虹桥路换乘11号线至东方体育中心，约45分钟"    },
+            { name:"民一中学", lat:31.55709, lng:121.63417, tier:8, addr:"崇明区堡镇解放街230号", score:"514", district:"崇明", metro:"崇明线至金吉路→9号线至世纪大道换乘6号线至东方体育中心，约90分钟"    },
         ];
 
         // ============ Haversine 距离计算 (返回公里) ============
@@ -313,15 +279,15 @@
         // ============ 地图初始化 ============
         const map = L.map('map').setView([START_POINT.lat, START_POINT.lng], 14);
 
-        L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
-            subdomains: ['1', '2', '3', '4'],
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
             maxZoom: 18,
         }).addTo(map);
 
         // ============ 起始点标记 ============
         const startIcon = L.divIcon({
             className: 'start-marker',
-            html: '<div style="background:#000;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;border:4px solid #ff4444;box-shadow:0 0 0 3px rgba(255,255,255,0.9), 0 4px 16px rgba(255,68,68,0.6);animation:pulse 2s infinite;">🏠</div>',
+            html: '<div style="background:#000;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;border:4px solid #ff4444;box-shadow:0 3px 12px rgba(255,68,68,0.5);animation:pulse 2s infinite;">🏠</div>',
             iconSize: [44, 44],
             iconAnchor: [22, 22],
         });
@@ -332,14 +298,14 @@
 
         // ============ Marker 样式配置 ============
         const tierConfig = {
-            1: { color: '#c62828', label: '第一梯队（浦东顶尖）', icon: '★', size: 34 },
-            2: { color: '#e65100', label: '第二梯队（浦东市重点）', icon: '◆', size: 28 },
-            3: { color: '#1565c0', label: '第三梯队（区重点/特色）', icon: '●', size: 24 },
-            4: { color: '#2e7d32', label: '第四梯队（普通高中）', icon: '■', size: 20 },
-            5: { color: '#6a1b9a', label: '民办高中（浦东）', icon: '▲', size: 18 },
-            6: { color: '#f44336', label: '委属市重点（外区）', icon: '⬟', size: 36 },
-            7: { color: '#00897b', label: '外区优质高中', icon: '⬢', size: 26 },
-            8: { color: '#78909c', label: '外区民办/特色', icon: '⬠', size: 22 },
+            1: { color: '#c62828', label: '第一梯队（浦东顶尖）', icon: '★', size: 26 },
+            2: { color: '#e65100', label: '第二梯队（浦东市重点）', icon: '◆', size: 22 },
+            3: { color: '#1565c0', label: '第三梯队（区重点/特色）', icon: '●', size: 18 },
+            4: { color: '#2e7d32', label: '第四梯队（普通高中）', icon: '■', size: 16 },
+            5: { color: '#6a1b9a', label: '民办高中（浦东）', icon: '▲', size: 14 },
+            6: { color: '#f44336', label: '委属市重点（外区）', icon: '⬟', size: 28 },
+            7: { color: '#00897b', label: '外区优质高中', icon: '⬢', size: 20 },
+            8: { color: '#78909c', label: '外区民办/特色', icon: '⬠', size: 16 },
         };
 
         const markerGroups = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[] };
@@ -351,9 +317,9 @@
             const borderRadius = isOuter ? '4px' : '50%';
             return L.divIcon({
                 className: 'custom-marker',
-                html: `<div style="background:${cfg.color};color:white;width:${cfg.size}px;height:${cfg.size}px;border-radius:${borderRadius};display:flex;align-items:center;justify-content:center;font-size:${cfg.size*0.48}px;font-weight:bold;border:3.5px solid white;box-shadow:0 0 0 2px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.45);cursor:pointer;position:relative;">${cfg.icon}</div>`,
-                iconSize: [cfg.size+10, cfg.size+10],
-                iconAnchor: [(cfg.size+10)/2, (cfg.size+10)/2],
+                html: `<div style="background:${cfg.color};color:white;width:${cfg.size}px;height:${cfg.size}px;border-radius:${borderRadius};display:flex;align-items:center;justify-content:center;font-size:${cfg.size*0.45}px;font-weight:bold;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;">${cfg.icon}</div>`,
+                iconSize: [cfg.size+6, cfg.size+6],
+                iconAnchor: [(cfg.size+6)/2, (cfg.size+6)/2],
             });
         }
 
@@ -370,9 +336,11 @@
             const districtText = s.district ? `<div style="font-size:11px;color:#888;margin-top:2px;">所在区：${s.district}</div>` : '';
             const scoreText = s.score ? `<div class="score">2025录取线（浦东）：${s.score}</div>` : '';
             const driveText = s._driveDist !== null
-                ? `<div class="dist-drive">🚗 估算驾车距离：约 ${formatDist(s._driveDist)}</div>`
+                ? `<div class="dist-drive">🚗 驾车距离：约 ${formatDist(s._driveDist)}</div>`
+                : `<div class="dist-loading">🚗 驾车距离：计算中...</div>`;
+            const metroText = s.metro
+                ? `<div class="metro-info">🚇 地铁路线：${s.metro}</div>`
                 : '';
-            const metroText = s.metro ? `<div class="dist-metro"> 地铁：${s.metro}</div>` : '';
 
             return `
                 <div class="school-popup" data-idx="${s._idx}">
@@ -382,10 +350,10 @@
                     ${featureText}
                     <div class="addr">地址：${s.addr}</div>
                     ${scoreText}
+                    ${metroText}
                     <div class="dist-box">
                         <div class="dist-line">📏 直线距离：${formatDist(s.straightDist)}</div>
                         ${driveText}
-                        ${metroText}
                     </div>
                 </div>
             `;
@@ -410,106 +378,24 @@
         }
         document.getElementById('countAll').textContent = allMarkers.length;
 
-        // ============ 图例筛选 + 学校列表 ============
+        // ============ 图例筛选 ============
         let activeTier = 'all';
-        let singleSchoolMode = false; // 是否处于单校显示模式
-
-        // 生成学校列表 HTML
-        function buildSchoolList(tier) {
-            const tierSchools = markerGroups[tier] || [];
-            // 按分数线从高到低排序
-            const sorted = [...tierSchools].sort((a, b) => {
-                const scoreA = parseFloat(String(a._schoolData.score).replace(/[^0-9.]/g, '')) || 0;
-                const scoreB = parseFloat(String(b._schoolData.score).replace(/[^0-9.]/g, '')) || 0;
-                return scoreB - scoreA;
-            });
-            return sorted.map(m => {
-                const s = m._schoolData;
-                const scoreText = s.score ? `<span class="list-score">${s.score}分</span>` : '';
-                return `<div class="school-list-item" data-idx="${s._idx}" data-tier="${tier}">${s.name}${scoreText}</div>`;
-            }).join('');
-        }
-
-        // 填充学校列表
-        for (let t = 1; t <= 8; t++) {
-            const container = document.querySelector(`.school-list-container[data-list-tier="${t}"]`);
-            if (container) container.innerHTML = buildSchoolList(t);
-        }
-
-        // 显示/隐藏指定梯队的学校
-        function showTierMarkers(tier) {
-            singleSchoolMode = false;
-            if (tier === 'all') {
-                allMarkers.forEach(m => map.hasLayer(m) || m.addTo(map));
-            } else {
-                const t = parseInt(tier);
-                allMarkers.forEach(m => {
-                    if (m._schoolData.tier === t) { if (!map.hasLayer(m)) m.addTo(map); }
-                    else { if (map.hasLayer(m)) m.removeFrom(map); }
-                });
-            }
-        }
-
-        // 只显示单个学校
-        function showSingleSchool(idx) {
-            singleSchoolMode = true;
-            const targetMarker = allMarkers[idx];
-            allMarkers.forEach(m => {
-                if (m === targetMarker) { if (!map.hasLayer(m)) m.addTo(map); }
-                else { if (map.hasLayer(m)) m.removeFrom(map); }
-            });
-            // 定位并打开弹窗
-            if (targetMarker) {
-                map.setView(targetMarker.getLatLng(), 16);
-                targetMarker.openPopup();
-            }
-        }
-
-        // 清除高亮
-        function clearHighlights() {
-            document.querySelectorAll('.school-list-item').forEach(el => el.classList.remove('active'));
-        }
-
-        // 图例项目点击 - 筛选 + 展开列表
         document.querySelectorAll('.legend-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                // 如果点击的是学校列表项，不处理
-                if (e.target.closest('.school-list-container')) return;
-
-                const tier = item.dataset.tier;
-                const toggle = item.querySelector('.legend-toggle');
-                const listContainer = item.nextElementSibling;
-                const isListContainer = listContainer && listContainer.classList.contains('school-list-container');
-
-                // 切换展开/收起
-                if (isListContainer && tier !== 'all') {
-                    const isOpen = listContainer.classList.contains('show');
-                    // 收起所有列表
-                    document.querySelectorAll('.school-list-container').forEach(c => c.classList.remove('show'));
-                    document.querySelectorAll('.legend-toggle').forEach(t => t.classList.remove('open'));
-                    // 如果之前是收起的，现在展开
-                    if (!isOpen) {
-                        listContainer.classList.add('show');
-                        if (toggle) toggle.classList.add('open');
-                    }
-                }
-
-                // 筛选地图标记
-                document.querySelectorAll('.legend-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                activeTier = tier;
-                showTierMarkers(tier);
-                clearHighlights();
-            });
-        });
-
-        // 学校列表项点击 - 只显示该学校
-        document.querySelectorAll('.school-list-item').forEach(item => {
             item.addEventListener('click', () => {
-                const idx = parseInt(item.dataset.idx);
-                clearHighlights();
-                item.classList.add('active');
-                showSingleSchool(idx);
+                const tier = item.dataset.tier;
+                document.querySelectorAll('.legend-item').forEach(i => i.style.background = '');
+                item.style.background = '#e8eaf6';
+                activeTier = tier;
+
+                if (tier === 'all') {
+                    allMarkers.forEach(m => map.hasLayer(m) || m.addTo(map));
+                } else {
+                    const t = parseInt(tier);
+                    allMarkers.forEach(m => {
+                        if (m._schoolData.tier === t) { if (!map.hasLayer(m)) m.addTo(map); }
+                        else { if (map.hasLayer(m)) m.removeFrom(map); }
+                    });
+                }
             });
         });
 
@@ -521,8 +407,13 @@
             searchTimeout = setTimeout(() => {
                 const query = searchInput.value.trim().toLowerCase();
                 if (!query) {
-                    showTierMarkers(activeTier);
-                    clearHighlights();
+                    if (activeTier === 'all') { allMarkers.forEach(m => { if (!map.hasLayer(m)) m.addTo(map); }); }
+                    else {
+                        allMarkers.forEach(m => {
+                            if (m._schoolData.tier === parseInt(activeTier)) { if (!map.hasLayer(m)) m.addTo(map); }
+                            else { if (map.hasLayer(m)) m.removeFrom(map); }
+                        });
+                    }
                     map.setView([START_POINT.lat, START_POINT.lng], 14);
                     return;
                 }
@@ -538,19 +429,69 @@
         });
 
         // ============ 自适应 ============
-        const bounds = L.latLngBounds([30.5, 120.9], [31.8, 122.1]);
-        map.setMinZoom(8);
-        map.setMaxBounds(bounds.pad(0.3));
+        const bounds = L.latLngBounds([30.68, 121.08], [31.65, 121.95]);
+        map.setMinZoom(9);
+        map.setMaxBounds(bounds.pad(0.2));
 
-        // ============ 使用预计算的直线距离（乘以系数估算驾车距离） ============
-        schools.forEach(s => {
-            s._driveDist = s.straightDist * 1.3;
-        });
+        // ============ OSRM 驾车距离计算 ============
+        async function fetchDrivingDistances() {
+            const statusEl = document.getElementById('drivingStatus');
+            statusEl.style.display = 'block';
+            statusEl.textContent = '正在计算驾车距离... 0/' + schools.length;
 
-        // 更新所有 marker 弹窗
-        allMarkers.forEach((marker, idx) => {
-            if (schools[idx]) marker.setPopupContent(buildPopup(schools[idx]));
-        });
+            // 构建 OSRM table 请求 - 分批处理
+            const BATCH_SIZE = 20;
+            const batches = [];
+            for (let i = 0; i < schools.length; i += BATCH_SIZE) {
+                batches.push(schools.slice(i, i + BATCH_SIZE));
+            }
+
+            let completed = 0;
+            for (const batch of batches) {
+                const coords = [START_POINT.lng + ',' + START_POINT.lat];
+                batch.forEach(s => coords.push(s.lng + ',' + s.lat));
+
+                try {
+                    const url = `https://router.project-osrm.org/table/v1/driving/${coords.join(';')}?sources=0&annotations=distance`;
+                    const resp = await fetch(url);
+                    const data = await resp.json();
+
+                    if (data.code === 'Ok' && data.distances) {
+                        const dists = data.distances[0];
+                        for (let j = 1; j < dists.length; j++) {
+                            const km = dists[j] / 1000;
+                            batch[j - 1]._driveDist = km;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('OSRM batch failed, using straight-line distances');
+                    batch.forEach(s => { if (s._driveDist === null) s._driveDist = s.straightDist * 1.35; });
+                }
+
+                completed += batch.length;
+                statusEl.textContent = `正在计算驾车距离... ${completed}/${schools.length}`;
+
+                // 更新已完成的 marker 弹窗
+                batch.forEach(s => {
+                    const marker = allMarkers[s._idx];
+                    if (marker) marker.setPopupContent(buildPopup(s));
+                });
+
+                // 避免请求过快
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            // 确保所有都有值
+            schools.forEach(s => {
+                if (s._driveDist === null) s._driveDist = s.straightDist * 1.35;
+            });
+
+            statusEl.textContent = '驾车距离计算完成 ';
+            setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+        }
+
+        // 页面加载后开始计算驾车距离
+        setTimeout(fetchDrivingDistances, 500);
     </script>
 </body>
 </html>
