@@ -628,9 +628,10 @@
         map.setMaxBounds(bounds.pad(0.2));
 
         // ============ OSRM 驾车距离计算 ============
-        // OSRM 返回的是理想路况驾驶时间，上海城市道路实际通行时间
-        // 需考虑红绿灯、拥堵、转弯等因素，乘以 1.4 倍修正系数
-        const DRIVE_TIME_FACTOR = 1.4;
+        // OSRM 基于 OpenStreetMap 真实道路数据进行路线规划（含转弯、道路等级、限速）
+        // 返回的距离是实际道路行驶距离，时间为理想路况（无红绿灯等待、无拥堵）
+        // 上海城市道路实际通行需乘以 1.6 倍修正系数（含信号灯、拥堵、变道等）
+        const DRIVE_TIME_FACTOR = 1.6;
 
         async function fetchDrivingDistances() {
             const statusEl = document.getElementById('drivingStatus');
