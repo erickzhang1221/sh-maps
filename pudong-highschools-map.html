@@ -75,6 +75,51 @@
             margin-bottom: 4px; font-weight: 600;
         }
 
+        .legend-toggle {
+            margin-left: 4px;
+            font-size: 10px;
+            color: #888;
+            cursor: pointer;
+            user-select: none;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+            display: inline-block;
+            min-width: 16px;
+            text-align: center;
+        }
+        .legend-toggle:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .school-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, margin-bottom 0.3s ease;
+            margin-left: 26px;
+            margin-bottom: 0;
+            font-size: 12px;
+        }
+        .school-list.open {
+            max-height: 260px;
+            overflow-y: auto;
+            margin-bottom: 8px;
+        }
+        .school-list-item {
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #444;
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .school-list-item:hover {
+            background: #e8eaf6;
+            color: #1a1a2e;
+        }
+
         .driving-status {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(255,255,255,0.95); border-radius: 20px;
@@ -379,11 +424,30 @@
         }
         document.getElementById('countAll').textContent = allMarkers.length;
 
-        // ============ 图例筛选 ============
+        // ============ 图例筛选 + 展开学校列表 ============
         let activeTier = 'all';
+        const tierSchoolLists = {};
+
         document.querySelectorAll('.legend-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const tier = item.dataset.tier;
+            const tier = item.dataset.tier;
+
+            // 创建展开按钮
+            const toggleBtn = document.createElement('span');
+            toggleBtn.className = 'legend-toggle';
+            toggleBtn.textContent = '▶';
+            toggleBtn.title = '展开学校列表';
+            item.appendChild(toggleBtn);
+
+            // 创建学校列表容器（紧跟在 legend-item 后面）
+            const listDiv = document.createElement('div');
+            listDiv.className = 'school-list';
+            listDiv.id = 'schoolList-' + tier;
+            item.parentNode.insertBefore(listDiv, item.nextSibling);
+            tierSchoolLists[tier] = listDiv;
+
+            // 图例点击 → 筛选
+            item.addEventListener('click', (e) => {
+                if (e.target.classList.contains('legend-toggle')) return;
                 document.querySelectorAll('.legend-item').forEach(i => i.style.background = '');
                 item.style.background = '#e8eaf6';
                 activeTier = tier;
@@ -397,6 +461,53 @@
                         else { if (map.hasLayer(m)) m.removeFrom(map); }
                     });
                 }
+            });
+
+            // 展开按钮点击 → 显示/隐藏学校列表
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = listDiv.classList.contains('open');
+
+                // 先关闭其他已展开的列表
+                document.querySelectorAll('.school-list.open').forEach(el => {
+                    el.classList.remove('open');
+                    el.innerHTML = '';
+                });
+                document.querySelectorAll('.legend-toggle').forEach(btn => btn.textContent = '▶');
+
+                if (isOpen) {
+                    listDiv.classList.remove('open');
+                    toggleBtn.textContent = '▶';
+                    return;
+                }
+
+                // 填充学校列表
+                let schoolsInTier = [];
+                if (tier === 'all') {
+                    schoolsInTier = allMarkers.map(m => m._schoolData);
+                } else {
+                    const t = parseInt(tier);
+                    schoolsInTier = allMarkers.filter(m => m._schoolData.tier === t).map(m => m._schoolData);
+                }
+
+                listDiv.innerHTML = schoolsInTier.map(s =>
+                    `<div class="school-list-item" data-name="${s.name}">${s.name}</div>`
+                ).join('');
+
+                // 绑定点击事件
+                listDiv.querySelectorAll('.school-list-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const name = el.dataset.name;
+                        const targetMarker = allMarkers.find(m => m._schoolData.name === name);
+                        if (targetMarker) {
+                            map.setView(targetMarker.getLatLng(), 15);
+                            targetMarker.openPopup();
+                        }
+                    });
+                });
+
+                listDiv.classList.add('open');
+                toggleBtn.textContent = '▼';
             });
         });
 
