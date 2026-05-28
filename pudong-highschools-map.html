@@ -628,6 +628,10 @@
         map.setMaxBounds(bounds.pad(0.2));
 
         // ============ OSRM 驾车距离计算 ============
+        // OSRM 返回的是理想路况驾驶时间，上海城市道路实际通行时间
+        // 需考虑红绿灯、拥堵、转弯等因素，乘以 1.4 倍修正系数
+        const DRIVE_TIME_FACTOR = 1.4;
+
         async function fetchDrivingDistances() {
             const statusEl = document.getElementById('drivingStatus');
             statusEl.style.display = 'block';
@@ -657,7 +661,7 @@
                             const km = dists[j] / 1000;
                             batch[j - 1]._driveDist = km;
                             if (durs && durs[j] != null) {
-                                batch[j - 1]._driveTime = durs[j] / 60; // 秒 → 分钟
+                                batch[j - 1]._driveTime = durs[j] / 60 * DRIVE_TIME_FACTOR; // 秒 → 分钟（含城市修正）
                             }
                         }
                     }
@@ -665,7 +669,7 @@
                     console.warn('OSRM batch failed, using straight-line distances');
                     batch.forEach(s => {
                         if (s._driveDist === null) s._driveDist = s.straightDist * 1.35;
-                        if (s._driveTime === null) s._driveTime = s.straightDist * 1.35 / 0.6; // 假设平均时速36km/h
+                        if (s._driveTime === null) s._driveTime = s.straightDist * 1.35 / 0.6 * DRIVE_TIME_FACTOR; // 假设平均时速36km/h（含修正）
                     });
                 }
 
@@ -685,7 +689,7 @@
             // 确保所有都有值
             schools.forEach(s => {
                 if (s._driveDist === null) s._driveDist = s.straightDist * 1.35;
-                if (s._driveTime === null) s._driveTime = s._driveDist / 0.6; // 假设平均时速36km/h
+                if (s._driveTime === null) s._driveTime = s._driveDist / 0.6 * DRIVE_TIME_FACTOR; // 假设平均时速36km/h（含修正）
             });
 
             statusEl.textContent = '驾车距离计算完成 ';
