@@ -155,16 +155,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0.5;
             cursor: pointer;
-            transition: opacity 0.35s cubic-bezier(.4,0,.2,1),
-                        transform 0.35s cubic-bezier(.4,0,.2,1),
-                        filter 0.35s ease;
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1),
+                        box-shadow 0.3s ease;
         }
         .marker-cloud:hover {
-            opacity: 0.85;
-            transform: translateY(-4px) scale(1.1);
-            filter: brightness(1.08);
+            transform: translateY(-3px) scale(1.08);
         }
 
         @media (max-width: 600px) {
@@ -407,12 +403,12 @@
             const isOuter = tier >= 6;
             const s = cfg.size;
             const br = isOuter ? '30%' : '50%';
-            const bg = `linear-gradient(180deg, ${hexToRgba(cfg.color,0.72)} 0%, ${hexToRgba(cfg.color,0.48)} 100%)`;
-            const shadow = `0 8px 28px ${hexToRgba(cfg.color,0.18)}, 0 2px 8px rgba(0,0,0,0.06)`;
-            const border = `2.5px solid rgba(255,255,255,0.85)`;
+            const bg = cfg.color;
+            const shadow = `0 4px 14px ${hexToRgba(cfg.color,0.35)}, 0 1px 4px rgba(0,0,0,0.12)`;
+            const border = `3px solid rgba(255,255,255,0.9)`;
             return L.divIcon({
                 className: 'custom-marker',
-                html: `<div class="marker-cloud" style="background:${bg};width:${s}px;height:${s}px;border-radius:${br};border:${border};box-shadow:${shadow};font-size:${s*0.46}px;color:white;text-shadow:0 1px 4px rgba(0,0,0,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">${cfg.icon}</div>`,
+                html: `<div class="marker-cloud" style="background:${bg};width:${s}px;height:${s}px;border-radius:${br};border:${border};box-shadow:${shadow};font-size:${s*0.46}px;color:white;font-weight:bold;text-shadow:0 1px 3px rgba(0,0,0,0.3);">${cfg.icon}</div>`,
                 iconSize: [s+14, s+14],
                 iconAnchor: [(s+14)/2, (s+14)/2],
             });
