@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>上海浦东新区高中梯队地图</title>
     <link rel="stylesheet" href="assets/leaflet.css" />
     <style>
@@ -373,6 +376,7 @@
         schools.forEach(s => {
             s.straightDist = haversineDistance(START_POINT.lat, START_POINT.lng, s.lat, s.lng);
             s._driveDist = null; // 驾车距离（异步加载）
+            s._driveTime = null; // 驾车时间（异步加载，分钟）
         });
 
         // ============ 生成弹窗内容 ============
@@ -382,7 +386,7 @@
             const districtText = s.district ? `<div style="font-size:11px;color:#888;margin-top:2px;">所在区：${s.district}</div>` : '';
             const scoreText = s.score ? `<div class="score">2025录取线（浦东）：${s.score}</div>` : '';
             const driveText = s._driveDist !== null
-                ? `<div class="dist-drive">🚗 驾车距离：约 ${formatDist(s._driveDist)}</div>`
+                ? `<div class="dist-drive">🚗 驾车：约 ${formatDist(s._driveDist)}（约${Math.round(s._driveTime)}分钟）</div>`
                 : `<div class="dist-loading">🚗 驾车距离：计算中...</div>`;
             const metroText = s.metro
                 ? `<div class="metro-info">🚇 地铁路线：${s.metro}</div>`
@@ -491,7 +495,7 @@
                 }
 
                 listDiv.innerHTML = schoolsInTier.map(s =>
-                    `<div class="school-list-item" data-name="${s.name}">${s.name}</div>`
+                    `<div class="school-list-item" data-name="${s.name}" title="🚇 ${s.metro}">${s.name}</div>`
                 ).join('');
 
                 // 绑定点击事件
@@ -564,20 +568,27 @@
                 batch.forEach(s => coords.push(s.lng + ',' + s.lat));
 
                 try {
-                    const url = `https://router.project-osrm.org/table/v1/driving/${coords.join(';')}?sources=0&annotations=distance`;
+                    const url = `https://router.project-osrm.org/table/v1/driving/${coords.join(';')}?sources=0&annotations=distance,duration`;
                     const resp = await fetch(url);
                     const data = await resp.json();
 
                     if (data.code === 'Ok' && data.distances) {
                         const dists = data.distances[0];
+                        const durs = data.durations ? data.durations[0] : null;
                         for (let j = 1; j < dists.length; j++) {
                             const km = dists[j] / 1000;
                             batch[j - 1]._driveDist = km;
+                            if (durs && durs[j] != null) {
+                                batch[j - 1]._driveTime = durs[j] / 60; // 秒 → 分钟
+                            }
                         }
                     }
                 } catch (e) {
                     console.warn('OSRM batch failed, using straight-line distances');
-                    batch.forEach(s => { if (s._driveDist === null) s._driveDist = s.straightDist * 1.35; });
+                    batch.forEach(s => {
+                        if (s._driveDist === null) s._driveDist = s.straightDist * 1.35;
+                        if (s._driveTime === null) s._driveTime = s.straightDist * 1.35 / 0.6; // 假设平均时速36km/h
+                    });
                 }
 
                 completed += batch.length;
@@ -596,6 +607,7 @@
             // 确保所有都有值
             schools.forEach(s => {
                 if (s._driveDist === null) s._driveDist = s.straightDist * 1.35;
+                if (s._driveTime === null) s._driveTime = s._driveDist / 0.6; // 假设平均时速36km/h
             });
 
             statusEl.textContent = '驾车距离计算完成 ';
