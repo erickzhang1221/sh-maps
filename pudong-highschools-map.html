@@ -585,6 +585,19 @@
                         const name = el.dataset.name;
                         const targetMarker = allMarkers.find(m => m._schoolData.name === name);
                         if (targetMarker) {
+                            const schoolTier = targetMarker._schoolData.tier;
+                            // 切换到该学校所属梯队，显示该梯队所有标记
+                            if (String(schoolTier) !== activeTier) {
+                                activeTier = String(schoolTier);
+                                // 更新图例高亮
+                                document.querySelectorAll('.legend-item').forEach(i => i.style.background = '');
+                                document.querySelector(`.legend-item[data-tier="${schoolTier}"]`).style.background = '#e8eaf6';
+                                // 显示该梯队所有标记，隐藏其他
+                                allMarkers.forEach(m => {
+                                    if (m._schoolData.tier === schoolTier) { if (!map.hasLayer(m)) m.addTo(map); }
+                                    else { if (map.hasLayer(m)) m.removeFrom(map); }
+                                });
+                            }
                             map.flyTo(targetMarker.getLatLng(), 15);
                             targetMarker.openPopup();
                         }
