@@ -128,6 +128,7 @@
         .filter-badge.t6 { background: #fff8e1; color: #e65100; }
         .filter-badge.t7 { background: #e0f7fa; color: #006064; }
         .filter-badge.t8 { background: #f3e5f5; color: #7b1fa2; }
+        .filter-badge.t9 { background: #fce4ec; color: #c2185b; }
 
         .legend-divider {
             border: none; border-top: 1px dashed #ccc;
@@ -267,6 +268,10 @@
             <div class="legend-color" style="background:#78909c;"></div><span>外区民办/特色</span>
             <span class="legend-count" id="countT8">0</span>
         </div>
+        <div class="legend-item" data-tier="9">
+            <div class="legend-color" style="background:#e91e63;"></div><span>美术艺术类高中</span>
+            <span class="legend-count" id="countT9">0</span>
+        </div>
     </div>
 
     <div class="search-box">
@@ -385,6 +390,11 @@
             { name:"安生学校", lat:31.27485, lng:121.38589, tier:8, addr:"普陀区桃清路58号", score:"521", district:"普陀", tuition:"10万/年", driveDist:20.6, driveTime:34.2, straightDist:16.03, metro:"从上海西站步行约1.7km（约23分钟）；11号线上海西站站直达东方体育中心，约40分钟", website:"https://www.amschool.cn/" },
             { name:"创艺高级中学", lat:31.4365, lng:121.36528, tier:8, addr:"宝山区潘泾路3039号", score:"521", district:"宝山", tuition:"12.4万/年", driveDist:37.7, driveTime:55.0, straightDist:32.94, metro:"从美兰湖站到学校约8.6km（步行约115分钟，建议骑行或公交）；步行至美兰湖站(7号线)，乘车约40分钟", website:"https://www.chuangyi.cn/" },
             { name:"民一中学", lat:31.55501, lng:121.63842, tier:8, addr:"崇明区堡镇解放街230号", score:"514", district:"崇明", tuition:"4万/年", driveDist:74.0, driveTime:105.9, straightDist:46.41, metro:"从基隆路站到学校约58.8km（步行约784分钟，建议骑行或公交）；步行至基隆路站(10号线)，乘车约40分钟", website:"https://www.minyi.cn/" },
+
+            // ====== 美术艺术类高中 ======
+            { name:"上海市香山中学", lat:31.238, lng:121.567, tier:9, addr:"浦东新区灵山路1672弄", score:"612.5", feature:"美术特色", benkeRate:"~88%", driveDist:14.9, driveTime:23.6, straightDist:11.75, metro:"从云山路站到学校约3.1km（步行约41分钟，建议骑行或公交）；6号线云山路站直达东方体育中心，约35分钟", website:"https://www.hsxs.pudong-edu.sh.cn/" },
+            { name:"上海市紫竹园中学", lat:31.1613, lng:121.4528, tier:9, addr:"徐汇区罗秀路99号", score:"592.5", district:"徐汇", feature:"美术特色", benkeRate:"~97%", driveDist:5.5, driveTime:12.0, straightDist:3.35, metro:"从上海南站步行约1.5km（约20分钟）；1号线上海南站→徐家汇换乘11号线至东方体育中心，约40分钟", website:"http://zzzx.xhedu.sh.cn:1053/" },
+            { name:"上戏附中", lat:31.23244, lng:121.44214, tier:9, addr:"静安区康定路770号", score:"577.5", district:"静安", feature:"戏剧艺术特色", benkeRate:"信息未公开", driveDist:12.8, driveTime:19.3, straightDist:9.19, metro:"从中潭路站步行约410m（约5分钟）；13号线武宁路→成山路换乘8号线至东方体育中心，约40分钟", website:"https://www.sdfzsh.cn/" },
         ];
 
         // ============ Haversine 距离计算 (返回公里) ============
@@ -432,9 +442,10 @@
             6: { color: '#f44336', label: '委属市重点（外区）', icon: '⬟', size: 40 },
             7: { color: '#00897b', label: '外区优质高中', icon: '⬢', size: 32 },
             8: { color: '#78909c', label: '外区民办/特色', icon: '⬠', size: 26 },
+            9: { color: '#e91e63', label: '美术艺术类高中', icon: '🎨', size: 32 },
         };
 
-        const markerGroups = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[] };
+        const markerGroups = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[] };
         const allMarkers = [];
 
         function hexToRgba(hex, alpha) {
@@ -522,7 +533,7 @@
         });
 
         // ============ 更新计数 ============
-        for (let t = 1; t <= 8; t++) {
+        for (let t = 1; t <= 9; t++) {
             document.getElementById(`countT${t}`).textContent = markerGroups[t].length;
         }
         document.getElementById('countAll').textContent = allMarkers.length;
