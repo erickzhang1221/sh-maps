@@ -55,6 +55,13 @@
         .school-popup .dist-box .dist-line { color: #333; }
         .school-popup .dist-box .dist-drive { color: #1565c0; font-weight: 600; }
         .school-popup .dist-box .dist-loading { color: #999; font-style: italic; }
+        .school-popup .tuition {
+            margin-top: 6px; padding: 5px 10px;
+            background: linear-gradient(135deg, #1b5e20 0%, #43a047 100%);
+            border-radius: 8px; color: #fff;
+            font-size: 12px; font-weight: 600;
+            box-shadow: 0 2px 6px rgba(27,94,32,0.3);
+        }
         .school-popup .metro-info {
             margin-top: 8px; padding: 8px 10px;
             background: linear-gradient(135deg, #e65100 0%, #ff8f00 100%);
@@ -303,7 +310,7 @@
             { name:"上海交通大学附属中学浦东实验高中", lat:31.2386, lng:121.5305, tier:3, addr:"浦东新区浦东大道830号", score:"604", driveDist:11.7, driveTime:21.9, straightDist:9.87, metro:"从民生路站步行约1.7km（约23分钟）；6号线民生路站直达东方体育中心，约30分钟", website:"https://www.hsjdsyzx.pudong-edu.sh.cn/" },
             { name:"华东理工大学附属浦东科技高级中学", lat:31.04108, lng:121.74599, tier:3, addr:"浦东新区惠南镇通济路929号", score:"659", driveDist:38.9, driveTime:51.6, straightDist:28.03, metro:"从惠南东站到学校约3.4km（步行约45分钟，建议骑行或公交）；16号线惠南→罗山路换乘11号线至东方体育中心，约95分钟", website:"https://www.hshlkj.pudong-edu.sh.cn/" },
             { name:"上海市川沙中学友仁分校", lat:31.19015, lng:121.69872, tier:3, addr:"浦东新区妙川路981号", score:"665", driveDist:26.1, driveTime:35.9, straightDist:20.59, metro:"从华夏东路站步行约236m（约3分钟）；2号线华夏东路→世纪大道换乘6号线至东方体育中心，约55分钟", website:"https://www.hschshyr.pudong-edu.sh.cn/" },
-            { name:"上海民办华曜浦东实验学校", lat:31.145, lng:121.623, tier:3, addr:"浦东新区川周公路2798号", score:"661", driveDist:16.7, driveTime:22.8, straightDist:13.17, metro:"从中科路站步行约2.5km（约33分钟）；13号线中科路→成山路换乘8号线至东方体育中心，约50分钟", website:"https://www.hysh.pudong-edu.sh.cn/" },
+            { name:"上海民办华曜浦东实验学校", lat:31.145, lng:121.623, tier:3, addr:"浦东新区川周公路2798号", score:"661", tuition:"7.8万/年", driveDist:16.7, driveTime:22.8, straightDist:13.17, metro:"从中科路站步行约2.5km（约33分钟）；13号线中科路→成山路换乘8号线至东方体育中心，约50分钟", website:"https://www.hysh.pudong-edu.sh.cn/" },
             // 第四梯队：普通高中
             { name:"上海市泾南中学", lat:31.242, lng:121.542, tier:4, addr:"浦东新区民生路303号", score:"574.5", driveDist:13.2, driveTime:22.8, straightDist:10.72, metro:"从北洋泾路站步行约484m（约6分钟）；6号线北洋泾路站直达东方体育中心，约25分钟", website:"https://www.hsjn.pudong-edu.sh.cn/" },
             { name:"上海市沪新中学", lat:31.27082, lng:121.58422, tier:4, addr:"浦东新区莱阳路224号", score:"563.5", driveDist:18.4, driveTime:29.5, straightDist:15.62, metro:"巨峰路站出站即达；6号线巨峰路站直达东方体育中心，约30分钟", website:"https://www.hshx.pudong-edu.sh.cn/" },
@@ -319,20 +326,20 @@
             { name:"上海市吴迅中学", lat:31.088, lng:121.595, tier:4, addr:"浦东新区周浦镇瑞和路578号", score:"558.5", driveDist:20.2, driveTime:27.0, straightDist:13.05, metro:"从鹤涛路站到学校约6.4km（步行约85分钟，建议骑行或公交）；18号线繁荣路→龙阳路换乘2→世纪大道换乘6号线至东方体育中心，约65分钟", website:"https://www.hswx.pudong-edu.sh.cn/" },
             { name:"上海市长岛中学", lat:31.262, lng:121.582, tier:4, addr:"长岛路（浦兴）", score:"581", driveDist:17.5, driveTime:28.3, straightDist:14.71, metro:"从博兴路站步行约163m（约2分钟）；6号线博兴路站直达东方体育中心，约30分钟", website:"https://www.hscd.pudong-edu.sh.cn/" },
             // 第五梯队：民办高中
-            { name:"上海民办光华中学", lat:31.14527, lng:121.62285, tier:5, addr:"浦东新区川周公路2800号", score:"589", driveDist:16.7, driveTime:22.8, straightDist:13.15, metro:"从中科路站步行约2.5km（约33分钟）；13号线中科路→成山路换乘8号线至东方体育中心，约50分钟", website:"https://www.hsgh.pudong-edu.sh.cn/" },
-            { name:"上海市民办尚德实验学校", lat:31.13545, lng:121.60049, tier:5, addr:"浦东新区秀沿路1688号", score:"619", driveDist:15.4, driveTime:23.2, straightDist:11.24, metro:"从秀沿路站步行约1.9km（约25分钟）；11号线秀沿路站直达东方体育中心，约35分钟", website:"https://www.sdsyzx.pudong-edu.sh.cn/" },
-            { name:"上海市民办金苹果学校", lat:31.282, lng:121.619, tier:5, addr:"浦东新区巨峰路1555号", score:"518.5", driveDist:21.9, driveTime:31.9, straightDist:18.69, metro:"从东靖路站到学校约3.5km（步行约47分钟，建议骑行或公交）；6号线东靖路站直达东方体育中心，约70分钟", website:"https://www.jinpingguo.pudong-edu.sh.cn/" },
-            { name:"上海浦东新区民办东鼎外国语学校", lat:31.04789, lng:121.76935, tier:5, addr:"浦东新区惠南镇观海路699号", score:"519.5", driveDist:41.4, driveTime:54.2, straightDist:29.7, metro:"从惠南东站到学校约5.6km（步行约75分钟，建议骑行或公交）；步行至惠南东站(16号线)，乘车约40分钟", website:"https://www.hsddwy.pudong-edu.sh.cn/" },
-            { name:"上海浦东新区民办万科学校", lat:31.14931, lng:121.5839, tier:5, addr:"浦东新区康桥路1700弄", score:"522.5", driveDist:13.0, driveTime:22.0, straightDist:9.42, metro:"从华夏中路站到学校约4.5km（步行约60分钟，建议骑行或公交）；13号线华夏中路→成山路换乘8号线至东方体育中心，约45分钟", website:"https://www.hsvanke.pudong-edu.sh.cn/" },
-            { name:"上海浦东新区民办惠立学校", lat:31.16069, lng:121.47744, tier:5, addr:"浦东新区林耀路235号", score:"519", driveDist:1.7, driveTime:5.1, straightDist:0.8, metro:"从灵岩南路站步行约1.4km（约19分钟）；6号线灵岩南路站直达东方体育中心，约10分钟", website:"https://www.hshuili.pudong-edu.sh.cn/" },
-            { name:"上海浦东新区民办宏文学校", lat:31.21792, lng:121.69432, tier:5, addr:"浦东新区川大路318号", score:"519.5", driveDist:23.6, driveTime:39.5, straightDist:20.93, metro:"从创新中路站到学校约4.5km（步行约60分钟，建议骑行或公交）；2号线创新中路→世纪大道换乘6号线至东方体育中心，约85分钟", website:"https://www.hshw.pudong-edu.sh.cn/" },
-            { name:"上海浦东民办未来科技学校", lat:31.19979, lng:121.6192, tier:5, addr:"浦东新区周浦镇沈横路1号", score:"607", driveDist:15.9, driveTime:26.4, straightDist:13.52, metro:"从金科路站步行约1.5km（约20分钟）；2号线金科路→世纪大道换乘6号线至东方体育中心，约55分钟", website:"https://www.hswlkj.pudong-edu.sh.cn/" },
-            { name:"上海浦东新区民办康德学校", lat:31.14276, lng:121.58221, tier:5, addr:"浦东新区康恒路70号", score:"521.5", driveDist:13.4, driveTime:22.9, straightDist:9.37, metro:"从华夏中路站步行约1.3km（约17分钟）；13号线华夏中路→成山路换乘8号线至东方体育中心，约40分钟", website:"https://www.hskd.pudong-edu.sh.cn/" },
-            { name:"上海市浦东新区民办浦实高级中学", lat:31.21786, lng:121.66427, tier:5, addr:"浦东新区唐陆公路3892号", score:"518", driveDist:20.5, driveTime:33.6, straightDist:18.24, metro:"从唐镇站到学校约3.3km（步行约44分钟，建议骑行或公交）；2号线唐镇→世纪大道换乘6号线至东方体育中心，约70分钟", website:"https://www.hspsgj.pudong-edu.sh.cn/" },
-            { name:"上海市民办育辛高级中学", lat:31.20794, lng:121.51439, tier:5, addr:"浦东新区浦三路385号", score:"531", driveDist:7.4, driveTime:14.4, straightDist:6.14, metro:"从上海儿童医学中心站步行约1.7km（约23分钟）；6号线上海儿童医学中心站直达东方体育中心，约15分钟", website:"https://www.hsyxgj.pudong-edu.sh.cn/" },
-            { name:"上海市民办丰华高级中学", lat:31.27401, lng:121.6001, tier:5, addr:"浦东新区凌河路420弄88号", score:"524.5", driveDist:21.1, driveTime:30.3, straightDist:16.84, metro:"从东靖路站步行约2.6km（约35分钟）；6号线东靖路站直达东方体育中心，约45分钟", website:"https://www.hsfhgj.pudong-edu.sh.cn/" },
-            { name:"民办上海工商外国语职业学院附属中学", lat:31.04589, lng:121.76735, tier:5, addr:"浦东新区惠南镇勤奋路228号", score:"518", driveDist:41.0, driveTime:55.1, straightDist:29.62, metro:"从惠南东站到学校约4.7km（步行约63分钟，建议骑行或公交）；步行至惠南东站(16号线)，乘车约40分钟", website:"https://www.hsgsfl.pudong-edu.sh.cn/" },
-            { name:"上海浦东新区民办沪港学校", lat:30.88157, lng:121.89515, tier:5, addr:"浦东新区银莲路2号", score:"568.5", driveDist:63.5, driveTime:79.4, straightDist:49.73, metro:"从临港大道站到学校约10.9km（步行约145分钟，建议骑行或公交）；16号线滴水湖→罗山路换乘11号线至东方体育中心，约125分钟", website:"https://www.hshg.pudong-edu.sh.cn/" },
+            { name:"上海民办光华中学", lat:31.14527, lng:121.62285, tier:5, addr:"浦东新区川周公路2800号", score:"589", tuition:"11.6万/年", driveDist:16.7, driveTime:22.8, straightDist:13.15, metro:"从中科路站步行约2.5km（约33分钟）；13号线中科路→成山路换乘8号线至东方体育中心，约50分钟", website:"https://www.hsgh.pudong-edu.sh.cn/" },
+            { name:"上海市民办尚德实验学校", lat:31.13545, lng:121.60049, tier:5, addr:"浦东新区秀沿路1688号", score:"619", tuition:"9万/年", driveDist:15.4, driveTime:23.2, straightDist:11.24, metro:"从秀沿路站步行约1.9km（约25分钟）；11号线秀沿路站直达东方体育中心，约35分钟", website:"https://www.sdsyzx.pudong-edu.sh.cn/" },
+            { name:"上海市民办金苹果学校", lat:31.282, lng:121.619, tier:5, addr:"浦东新区巨峰路1555号", score:"518.5", tuition:"6.2万/年", driveDist:21.9, driveTime:31.9, straightDist:18.69, metro:"从东靖路站到学校约3.5km（步行约47分钟，建议骑行或公交）；6号线东靖路站直达东方体育中心，约70分钟", website:"https://www.jinpingguo.pudong-edu.sh.cn/" },
+            { name:"上海浦东新区民办东鼎外国语学校", lat:31.04789, lng:121.76935, tier:5, addr:"浦东新区惠南镇观海路699号", score:"519.5", tuition:"6万/年", driveDist:41.4, driveTime:54.2, straightDist:29.7, metro:"从惠南东站到学校约5.6km（步行约75分钟，建议骑行或公交）；步行至惠南东站(16号线)，乘车约40分钟", website:"https://www.hsddwy.pudong-edu.sh.cn/" },
+            { name:"上海浦东新区民办万科学校", lat:31.14931, lng:121.5839, tier:5, addr:"浦东新区康桥路1700弄", score:"522.5", tuition:"22万/年", driveDist:13.0, driveTime:22.0, straightDist:9.42, metro:"从华夏中路站到学校约4.5km（步行约60分钟，建议骑行或公交）；13号线华夏中路→成山路换乘8号线至东方体育中心，约45分钟", website:"https://www.hsvanke.pudong-edu.sh.cn/" },
+            { name:"上海浦东新区民办惠立学校", lat:31.16069, lng:121.47744, tier:5, addr:"浦东新区林耀路235号", score:"519", tuition:"22万/年", driveDist:1.7, driveTime:5.1, straightDist:0.8, metro:"从灵岩南路站步行约1.4km（约19分钟）；6号线灵岩南路站直达东方体育中心，约10分钟", website:"https://www.hshuili.pudong-edu.sh.cn/" },
+            { name:"上海浦东新区民办宏文学校", lat:31.21792, lng:121.69432, tier:5, addr:"浦东新区川大路318号", score:"519.5", tuition:"21万/年", driveDist:23.6, driveTime:39.5, straightDist:20.93, metro:"从创新中路站到学校约4.5km（步行约60分钟，建议骑行或公交）；2号线创新中路→世纪大道换乘6号线至东方体育中心，约85分钟", website:"https://www.hshw.pudong-edu.sh.cn/" },
+            { name:"上海浦东民办未来科技学校", lat:31.19979, lng:121.6192, tier:5, addr:"浦东新区周浦镇沈横路1号", score:"607", tuition:"10.8万/年", driveDist:15.9, driveTime:26.4, straightDist:13.52, metro:"从金科路站步行约1.5km（约20分钟）；2号线金科路→世纪大道换乘6号线至东方体育中心，约55分钟", website:"https://www.hswlkj.pudong-edu.sh.cn/" },
+            { name:"上海浦东新区民办康德学校", lat:31.14276, lng:121.58221, tier:5, addr:"浦东新区康恒路70号", score:"521.5", tuition:"19.8万/年", driveDist:13.4, driveTime:22.9, straightDist:9.37, metro:"从华夏中路站步行约1.3km（约17分钟）；13号线华夏中路→成山路换乘8号线至东方体育中心，约40分钟", website:"https://www.hskd.pudong-edu.sh.cn/" },
+            { name:"上海市浦东新区民办浦实高级中学", lat:31.21786, lng:121.66427, tier:5, addr:"浦东新区唐陆公路3892号", score:"518", tuition:"5.4万/年", driveDist:20.5, driveTime:33.6, straightDist:18.24, metro:"从唐镇站到学校约3.3km（步行约44分钟，建议骑行或公交）；2号线唐镇→世纪大道换乘6号线至东方体育中心，约70分钟", website:"https://www.hspsgj.pudong-edu.sh.cn/" },
+            { name:"上海市民办育辛高级中学", lat:31.20794, lng:121.51439, tier:5, addr:"浦东新区浦三路385号", score:"531", tuition:"3.6万/年", driveDist:7.4, driveTime:14.4, straightDist:6.14, metro:"从上海儿童医学中心站步行约1.7km（约23分钟）；6号线上海儿童医学中心站直达东方体育中心，约15分钟", website:"https://www.hsyxgj.pudong-edu.sh.cn/" },
+            { name:"上海市民办丰华高级中学", lat:31.27401, lng:121.6001, tier:5, addr:"浦东新区凌河路420弄88号", score:"524.5", tuition:"4.3万/年", driveDist:21.1, driveTime:30.3, straightDist:16.84, metro:"从东靖路站步行约2.6km（约35分钟）；6号线东靖路站直达东方体育中心，约45分钟", website:"https://www.hsfhgj.pudong-edu.sh.cn/" },
+            { name:"民办上海工商外国语职业学院附属中学", lat:31.04589, lng:121.76735, tier:5, addr:"浦东新区惠南镇勤奋路228号", score:"518", tuition:"4万/年", driveDist:41.0, driveTime:55.1, straightDist:29.62, metro:"从惠南东站到学校约4.7km（步行约63分钟，建议骑行或公交）；步行至惠南东站(16号线)，乘车约40分钟", website:"https://www.hsgsfl.pudong-edu.sh.cn/" },
+            { name:"上海浦东新区民办沪港学校", lat:30.88157, lng:121.89515, tier:5, addr:"浦东新区银莲路2号", score:"568.5", tuition:"17.8万/年", driveDist:63.5, driveTime:79.4, straightDist:49.73, metro:"从临港大道站到学校约10.9km（步行约145分钟，建议骑行或公交）；16号线滴水湖→罗山路换乘11号线至东方体育中心，约125分钟", website:"https://www.hshg.pudong-edu.sh.cn/" },
 
             // ====== 外区高中（全市招生，浦东生源可报考） ======
             // 来源：2025年浦东新区"1至15志愿"统一招生录取分数线
@@ -352,25 +359,25 @@
             { name:"宝山华曜", lat:31.3881, lng:121.48651, tier:7, addr:"宝山区鄱阳湖路635号", score:"633", district:"宝山", driveDist:29.8, driveTime:38.4, straightDist:25.52, metro:"从共富新村站到学校约10.1km（步行约135分钟，建议骑行或公交）；步行至共富新村站(1号线)，乘车约40分钟", website:"https://www.baoshanhuayao.com/" },
             { name:"同济创意中学", lat:31.22804, lng:121.4845, tier:7, addr:"黄浦区四川中路599号", score:"630", district:"黄浦", driveDist:11.1, driveTime:18.1, straightDist:7.72, metro:"从中兴路站步行约1.2km（约16分钟）；8号线中兴路站直达东方体育中心，约25分钟", website:"https://www.tjcyzx.cn/" },
             // Tier 8：外区民办/特色高中
-            { name:"维尚高级中学", lat:31.37769, lng:121.49474, tier:8, addr:"宝山区同济路299号", score:"610", district:"宝山", driveDist:28.4, driveTime:35.9, straightDist:24.38, metro:"从共富新村站到学校约8.8km（步行约117分钟，建议骑行或公交）；步行至共富新村站(1号线)，乘车约40分钟", website:"https://www.weishang.cn/" },
-            { name:"科德高级中学", lat:31.02788, lng:121.23441, tier:8, addr:"松江区外青松公路9488号", score:"609", district:"松江", driveDist:34.1, driveTime:48.2, straightDist:27.98, metro:"从松江体育中心站步行约1.8km（约24分钟）；9号线松江体育中心→世纪大道换乘6号线至东方体育中心，约90分钟", website:"https://www.kede.cn/" },
-            { name:"燎原双语学校", lat:31.14205, lng:121.4115, tier:8, addr:"闵行区平阳路150号", score:"588", district:"闵行", driveDist:9.7, driveTime:18.0, straightDist:7.28, metro:"从锦江乐园站步行约220m（约3分钟）；1号线锦江乐园→徐家汇换乘11号线至东方体育中心，约35分钟", website:"https://www.liaoyuan.cn/" },
-            { name:"宏润博源学校", lat:31.14597, lng:121.21245, tier:8, addr:"青浦区课植园路178号", score:"584.5", district:"青浦", driveDist:33.2, driveTime:48.8, straightDist:26.02, metro:"从赵巷站到学校约7.4km（步行约99分钟，建议骑行或公交）；步行至赵巷站(17号线)，乘车约40分钟", website:"https://www.hrbyschool.com/" },
-            { name:"交大南洋中学", lat:30.73782, lng:121.34453, tier:8, addr:"金山区松隐大街100号", score:"582.5", district:"金山", driveDist:62.2, driveTime:84.8, straightDist:48.68, metro:"从奉贤新城站到学校约31.6km（步行约421分钟，建议骑行或公交）；步行至奉贤新城站(5号线)，乘车约40分钟", website:"https://www.jdny.cn/" },
+            { name:"维尚高级中学", lat:31.37769, lng:121.49474, tier:8, addr:"宝山区同济路299号", score:"610", district:"宝山", tuition:"16万/年", driveDist:28.4, driveTime:35.9, straightDist:24.38, metro:"从共富新村站到学校约8.8km（步行约117分钟，建议骑行或公交）；步行至共富新村站(1号线)，乘车约40分钟", website:"https://www.weishang.cn/" },
+            { name:"科德高级中学", lat:31.02788, lng:121.23441, tier:8, addr:"松江区外青松公路9488号", score:"609", district:"松江", tuition:"18万/年", driveDist:34.1, driveTime:48.2, straightDist:27.98, metro:"从松江体育中心站步行约1.8km（约24分钟）；9号线松江体育中心→世纪大道换乘6号线至东方体育中心，约90分钟", website:"https://www.kede.cn/" },
+            { name:"燎原双语学校", lat:31.14205, lng:121.4115, tier:8, addr:"闵行区平阳路150号", score:"588", district:"闵行", tuition:"3.12万/年", driveDist:9.7, driveTime:18.0, straightDist:7.28, metro:"从锦江乐园站步行约220m（约3分钟）；1号线锦江乐园→徐家汇换乘11号线至东方体育中心，约35分钟", website:"https://www.liaoyuan.cn/" },
+            { name:"宏润博源学校", lat:31.14597, lng:121.21245, tier:8, addr:"青浦区课植园路178号", score:"584.5", district:"青浦", tuition:"19.5万/年", driveDist:33.2, driveTime:48.8, straightDist:26.02, metro:"从赵巷站到学校约7.4km（步行约99分钟，建议骑行或公交）；步行至赵巷站(17号线)，乘车约40分钟", website:"https://www.hrbyschool.com/" },
+            { name:"交大南洋中学", lat:30.73782, lng:121.34453, tier:8, addr:"金山区松隐大街100号", score:"582.5", district:"金山", tuition:"3.36万/年", driveDist:62.2, driveTime:84.8, straightDist:48.68, metro:"从奉贤新城站到学校约31.6km（步行约421分钟，建议骑行或公交）；步行至奉贤新城站(5号线)，乘车约40分钟", website:"https://www.jdny.cn/" },
             { name:"上戏附中", lat:31.23244, lng:121.44214, tier:8, addr:"静安区康定路770号", score:"577.5", district:"静安", driveDist:12.8, driveTime:19.3, straightDist:9.19, metro:"从中潭路站步行约410m（约5分钟）；13号线武宁路→成山路换乘8号线至东方体育中心，约40分钟", website:"https://www.sdfzsh.cn/" },
-            { name:"博华双语学校", lat:30.9179, lng:121.47451, tier:8, addr:"奉贤区八字桥路686号", score:"567.5", district:"奉贤", driveDist:31.5, driveTime:48.1, straightDist:26.79, metro:"从奉贤新城站步行约958m（约13分钟）；5号线奉贤新城→莘庄换乘1→徐家汇换乘11号线至东方体育中心，约85分钟", website:"https://www.bohua.cn/" },
-            { name:"青浦协和双语", lat:31.12355, lng:121.23987, tier:8, addr:"青浦区业锦路32号", score:"559.5", district:"青浦", driveDist:29.1, driveTime:46.6, straightDist:23.7, metro:"从赵巷站到学校约6.6km（步行约88分钟，建议骑行或公交）；步行至赵巷站(17号线)，乘车约40分钟", website:"https://www.qingpuxiehe.com/" },
-            { name:"西外外国语学校", lat:31.04665, lng:121.23244, tier:8, addr:"松江区文翔路1100号", score:"558.5", district:"松江", driveDist:32.7, driveTime:45.5, straightDist:27.12, metro:"从松江体育中心站步行约2.7km（约36分钟）；9号线松江体育中心→世纪大道换乘6号线至东方体育中心，约110分钟", website:"https://www.xiwai.com/" },
-            { name:"赫贤学校", lat:31.0368, lng:121.254, tier:8, addr:"松江区茸北路336号", score:"558.5", district:"松江", driveDist:31.9, driveTime:44.3, straightDist:25.87, metro:"从松江体育中心站步行约2.2km（约29分钟）；9号线松江新城→世纪大道换乘6号线至东方体育中心，约90分钟", website:"https://www.heschool.cn/" },
+            { name:"博华双语学校", lat:30.9179, lng:121.47451, tier:8, addr:"奉贤区八字桥路686号", score:"567.5", district:"奉贤", tuition:"2.6万/年", driveDist:31.5, driveTime:48.1, straightDist:26.79, metro:"从奉贤新城站步行约958m（约13分钟）；5号线奉贤新城→莘庄换乘1→徐家汇换乘11号线至东方体育中心，约85分钟", website:"https://www.bohua.cn/" },
+            { name:"青浦协和双语", lat:31.12355, lng:121.23987, tier:8, addr:"青浦区业锦路32号", score:"559.5", district:"青浦", tuition:"17万/年", driveDist:29.1, driveTime:46.6, straightDist:23.7, metro:"从赵巷站到学校约6.6km（步行约88分钟，建议骑行或公交）；步行至赵巷站(17号线)，乘车约40分钟", website:"https://www.qingpuxiehe.com/" },
+            { name:"西外外国语学校", lat:31.04665, lng:121.23244, tier:8, addr:"松江区文翔路1100号", score:"558.5", district:"松江", tuition:"6.4万/年", driveDist:32.7, driveTime:45.5, straightDist:27.12, metro:"从松江体育中心站步行约2.7km（约36分钟）；9号线松江体育中心→世纪大道换乘6号线至东方体育中心，约110分钟", website:"https://www.xiwai.com/" },
+            { name:"赫贤学校", lat:31.0368, lng:121.254, tier:8, addr:"松江区茸北路336号", score:"558.5", district:"松江", tuition:"23万/年", driveDist:31.9, driveTime:44.3, straightDist:25.87, metro:"从松江体育中心站步行约2.2km（约29分钟）；9号线松江新城→世纪大道换乘6号线至东方体育中心，约90分钟", website:"https://www.heschool.cn/" },
             { name:"上音安师实验中学", lat:31.23665, lng:121.42974, tier:8, addr:"普陀区武宁路48号", score:"557", district:"普陀", driveDist:15.6, driveTime:23.4, straightDist:10.17, metro:"从长寿路站步行约2.2km（约29分钟）；13号线武宁路→成山路换乘8号线至东方体育中心，约30分钟", website:"https://www.shyas.cn/" },
-            { name:"华盛怀少学校", lat:31.29656, lng:121.31383, tier:8, addr:"嘉定区古猗园路718号", score:"548", district:"嘉定", driveDist:30.7, driveTime:41.5, straightDist:22.4, metro:"从南翔站步行约3.0km（约40分钟）；11号线南翔站直达东方体育中心，约65分钟", website:"https://www.huashenghuaishao.cn/" },
-            { name:"同洲模范学校", lat:31.32147, lng:121.46711, tier:8, addr:"宝山区共康东路188号", score:"540", district:"宝山", driveDist:22.6, driveTime:31.1, straightDist:18.19, metro:"从共富新村站步行约2.8km（约37分钟）；1号线共富新村→徐家汇换乘11号线至东方体育中心，约65分钟", website:"https://www.tongzhou.cn/" },
-            { name:"永昌中学", lat:30.73584, lng:121.35455, tier:8, addr:"金山区山富西路99号", score:"529", district:"金山", driveDist:61.5, driveTime:82.2, straightDist:48.64, metro:"从奉贤新城站到学校约30.9km（步行约412分钟，建议骑行或公交）；步行至奉贤新城站(5号线)，乘车约40分钟", website:"https://www.yongchang.cn/" },
-            { name:"行中中学", lat:31.41805, lng:121.43485, tier:8, addr:"宝山区塘南街52号", score:"526", district:"宝山", driveDist:33.7, driveTime:43.7, straightDist:29.25, metro:"从顾村公园站到学校约11.2km（步行约149分钟，建议骑行或公交）；步行至顾村公园站(7,15号线)，乘车约40分钟", website:"https://www.hangzhong.cn/" },
-            { name:"美达菲双语学校", lat:30.96851, lng:121.48067, tier:8, addr:"奉贤区汇丰北路799号", score:"524.5", district:"奉贤", driveDist:25.0, driveTime:39.1, straightDist:21.14, metro:"从环城东路站到学校约5.3km（步行约71分钟，建议骑行或公交）；5号线环城东路→莘庄换乘1→徐家汇换乘11号线至东方体育中心，约110分钟", website:"https://www.meidafi.cn/" },
-            { name:"安生学校", lat:31.27485, lng:121.38589, tier:8, addr:"普陀区桃清路58号", score:"521", district:"普陀", driveDist:20.6, driveTime:34.2, straightDist:16.03, metro:"从上海西站步行约1.7km（约23分钟）；11号线上海西站站直达东方体育中心，约40分钟", website:"https://www.amschool.cn/" },
-            { name:"创艺高级中学", lat:31.4365, lng:121.36528, tier:8, addr:"宝山区潘泾路3039号", score:"521", district:"宝山", driveDist:37.7, driveTime:55.0, straightDist:32.94, metro:"从美兰湖站到学校约8.6km（步行约115分钟，建议骑行或公交）；步行至美兰湖站(7号线)，乘车约40分钟", website:"https://www.chuangyi.cn/" },
-            { name:"民一中学", lat:31.55501, lng:121.63842, tier:8, addr:"崇明区堡镇解放街230号", score:"514", district:"崇明", driveDist:74.0, driveTime:105.9, straightDist:46.41, metro:"从基隆路站到学校约58.8km（步行约784分钟，建议骑行或公交）；步行至基隆路站(10号线)，乘车约40分钟", website:"https://www.minyi.cn/" },
+            { name:"华盛怀少学校", lat:31.29656, lng:121.31383, tier:8, addr:"嘉定区古猗园路718号", score:"548", district:"嘉定", tuition:"16万/年", driveDist:30.7, driveTime:41.5, straightDist:22.4, metro:"从南翔站步行约3.0km（约40分钟）；11号线南翔站直达东方体育中心，约65分钟", website:"https://www.huashenghuaishao.cn/" },
+            { name:"同洲模范学校", lat:31.32147, lng:121.46711, tier:8, addr:"宝山区共康东路188号", score:"540", district:"宝山", tuition:"5.04万/年", driveDist:22.6, driveTime:31.1, straightDist:18.19, metro:"从共富新村站步行约2.8km（约37分钟）；1号线共富新村→徐家汇换乘11号线至东方体育中心，约65分钟", website:"https://www.tongzhou.cn/" },
+            { name:"永昌中学", lat:30.73584, lng:121.35455, tier:8, addr:"金山区山富西路99号", score:"529", district:"金山", tuition:"8万/年", driveDist:61.5, driveTime:82.2, straightDist:48.64, metro:"从奉贤新城站到学校约30.9km（步行约412分钟，建议骑行或公交）；步行至奉贤新城站(5号线)，乘车约40分钟", website:"https://www.yongchang.cn/" },
+            { name:"行中中学", lat:31.41805, lng:121.43485, tier:8, addr:"宝山区塘南街52号", score:"526", district:"宝山", tuition:"8.1万/年", driveDist:33.7, driveTime:43.7, straightDist:29.25, metro:"从顾村公园站到学校约11.2km（步行约149分钟，建议骑行或公交）；步行至顾村公园站(7,15号线)，乘车约40分钟", website:"https://www.hangzhong.cn/" },
+            { name:"美达菲双语学校", lat:30.96851, lng:121.48067, tier:8, addr:"奉贤区汇丰北路799号", score:"524.5", district:"奉贤", tuition:"8万/年", driveDist:25.0, driveTime:39.1, straightDist:21.14, metro:"从环城东路站到学校约5.3km（步行约71分钟，建议骑行或公交）；5号线环城东路→莘庄换乘1→徐家汇换乘11号线至东方体育中心，约110分钟", website:"https://www.meidafi.cn/" },
+            { name:"安生学校", lat:31.27485, lng:121.38589, tier:8, addr:"普陀区桃清路58号", score:"521", district:"普陀", tuition:"10万/年", driveDist:20.6, driveTime:34.2, straightDist:16.03, metro:"从上海西站步行约1.7km（约23分钟）；11号线上海西站站直达东方体育中心，约40分钟", website:"https://www.amschool.cn/" },
+            { name:"创艺高级中学", lat:31.4365, lng:121.36528, tier:8, addr:"宝山区潘泾路3039号", score:"521", district:"宝山", tuition:"12.4万/年", driveDist:37.7, driveTime:55.0, straightDist:32.94, metro:"从美兰湖站到学校约8.6km（步行约115分钟，建议骑行或公交）；步行至美兰湖站(7号线)，乘车约40分钟", website:"https://www.chuangyi.cn/" },
+            { name:"民一中学", lat:31.55501, lng:121.63842, tier:8, addr:"崇明区堡镇解放街230号", score:"514", district:"崇明", tuition:"4万/年", driveDist:74.0, driveTime:105.9, straightDist:46.41, metro:"从基隆路站到学校约58.8km（步行约784分钟，建议骑行或公交）；步行至基隆路站(10号线)，乘车约40分钟", website:"https://www.minyi.cn/" },
         ];
 
         // ============ Haversine 距离计算 (返回公里) ============
@@ -461,6 +468,7 @@
             const tierBadge = `<span class="filter-badge t${s.tier}">${tierConfig[s.tier].label}</span>`;
             const featureText = s.feature ? `<div style="font-size:11px;color:#6a1b9a;margin-top:2px;">${s.feature}</div>` : '';
             const districtText = s.district ? `<div style="font-size:11px;color:#888;margin-top:2px;">所在区：${s.district}</div>` : '';
+            const tuitionText = s.tuition ? `<div class="tuition">💰 学费：约${s.tuition}</div>` : '';
             const scoreText = s.score ? `<div class="score">2025录取线（浦东）：${s.score}</div>` : '';
             const driveText = s._driveDist !== null
                 ? `<div class="dist-drive">🚗 驾车：约 ${formatDist(s._driveDist)}（约${Math.round(s._driveTime)}分钟）</div>`
@@ -478,6 +486,7 @@
                     <div>${tierBadge}</div>
                     ${districtText}
                     ${featureText}
+                    ${tuitionText}
                     <div class="addr">地址：${s.addr}</div>
                     ${scoreText}
                     ${metroText}
