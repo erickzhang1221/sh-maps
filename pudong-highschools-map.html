@@ -496,7 +496,7 @@
             const marker = L.marker([s.lat, s.lng], {
                 icon: createIcon(s.tier), riseOnHover: true, zIndexOffset: 100 - s.tier * 10,
             });
-            marker.bindPopup(buildPopup(s));
+            marker.bindPopup(buildPopup(s), { autoPan: false });
             marker._schoolData = s;
             markerGroups[s.tier].push(marker);
             allMarkers.push(marker);
@@ -585,7 +585,7 @@
                         const name = el.dataset.name;
                         const targetMarker = allMarkers.find(m => m._schoolData.name === name);
                         if (targetMarker) {
-                            map.setView(targetMarker.getLatLng(), 15);
+                            map.flyTo(targetMarker.getLatLng(), 15);
                             targetMarker.openPopup();
                         }
                     });
@@ -621,7 +621,7 @@
                         if (!found) found = m;
                     } else { if (map.hasLayer(m)) m.removeFrom(map); }
                 });
-                if (found) { map.setView(found.getLatLng(), 15); found.openPopup(); }
+                if (found) { map.flyTo(found.getLatLng(), 15); found.openPopup(); }
             }, 300);
         });
 
