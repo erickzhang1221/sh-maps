@@ -547,6 +547,9 @@
             markerGroups[s.tier].push(marker);
             allMarkers.push(marker);
             marker.addTo(map);
+            marker.on('click', () => {
+                map.flyTo(marker.getLatLng(), 15);
+            });
         });
 
         // ============ 更新计数 ============
